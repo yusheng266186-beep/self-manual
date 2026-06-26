@@ -1,0 +1,1488 @@
+﻿<!DOCTYPE html>
+<html lang="zh"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自我使用说明书 - 高考志愿版</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+/* ── Reset ── */
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* ── Page shell ── */
+body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px 0;font-family:'Noto Sans SC',sans-serif}
+
+/* ── Phone frame ── */
+.phone-wrap{position:relative}
+.phone{
+  width:360px;
+  background:#f7f4ee;
+  border-radius:44px;
+  border:2px solid #c8c4b8;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  height:740px;
+  box-shadow:0 24px 56px rgba(32,28,24,0.18),0 4px 12px rgba(32,28,24,0.10);
+  position: relative;
+}
+
+/* ── Notch ── */
+.notch{height:28px;background:#ede9df;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notch-pill{width:84px;height:10px;background:#c2beb3;border-radius:10px}
+
+/* ── Header ── */
+.hd{padding:12px 18px 10px;background:#f7f4ee;border-bottom:0.5px solid #ddd9cf;flex-shrink:0;display:flex;align-items:center;gap:10px}
+.hd-dot{width:8px;height:8px;border-radius:50%;background:#8f3d2c;flex-shrink:0;animation: pulse 2s infinite;}
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(143, 61, 44, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(143, 61, 44, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(143, 61, 44, 0); }
+}
+.hd-text{}
+.hd-name{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:600;color:#2e2b27;letter-spacing:0.04em}
+.hd-sub{font-size:10px;color:#8a8278;margin-top:1px;letter-spacing:0.06em}
+
+/* ── Chat messages ── */
+.msgs{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+.msgs::-webkit-scrollbar{width:0}
+
+.row{display:flex;max-width:100%;animation:fi 0.28s ease forwards;opacity:0}
+.row.ai{justify-content:flex-start}
+.row.user{justify-content:flex-end}
+
+.bub{padding:9px 13px;border-radius:16px;font-size:12.5px;line-height:1.75;letter-spacing:0.01em;max-width:248px;word-break:break-all}
+.bub.ai{background:#ece6da;color:#2e2b27;border-bottom-left-radius:3px}
+.bub.user{background:#2e2b27;color:#f5f1ea;border-bottom-right-radius:3px}
+
+/* typing dots */
+.typing-row{display:flex;justify-content:flex-start;margin-bottom:8px;animation:fi 0.2s ease forwards}
+.typing{display:flex;gap:4px;align-items:center;padding:12px 16px;background:#ece6da;border-radius:16px;border-bottom-left-radius:3px;width:fit-content}
+.typing span{width:6px;height:6px;background:#8a8278;border-radius:50%;animation:bop 1.1s ease infinite}
+.typing span:nth-child(2){animation-delay:.18s}
+.typing span:nth-child(3){animation-delay:.36s}
+@keyframes bop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* ── Question choices area ── */
+.choices-box{
+  background:#f7f4ee;
+  border-top:0.5px solid #ddd9cf;
+  padding:10px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex-shrink:0;
+  transition: all 0.3s ease;
+}
+.choices-title{
+  font-size:10.5px;
+  color:#8a8278;
+  letter-spacing:0.02em;
+  margin-bottom:2px;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.choices-grid{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:8px;
+}
+.choice-btn{
+  background:#faf7f2;
+  border:1px solid #dcd7cd;
+  border-radius:10px;
+  padding:10px 8px;
+  font-size:11.5px;
+  color:#4a423a;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1.4;
+  height:44px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-weight:500;
+}
+.choice-btn:hover, .choice-btn:active{
+  background:#2e2b27;
+  color:#f7f4ee;
+  border-color:#2e2b27;
+}
+
+/* ── Quick-reply chips (post-report) ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px;flex-shrink:0;background:#f7f4ee;border-top:0.5px solid #ddd9cf;}
+.chip{flex:1;text-align:center;min-width:90px;padding:8px 10px;background:#ece6da;border:0.5px solid #c8c4b8;border-radius:10px;font-size:11px;color:#2e2b27;cursor:pointer;letter-spacing:0.02em;transition:all 0.15s;font-weight:500;}
+.chip:hover{background:#2e2b27;color:#f7f4ee;border-color:#2e2b27}
+
+/* ── Input row ── */
+.inp-row{display:flex;gap:8px;padding:10px 14px 14px;border-top:0.5px solid #ddd9cf;background:#f7f4ee;flex-shrink:0;align-items:flex-end}
+.inp-row textarea{flex:1;background:#ece6da;border:none;border-radius:12px;padding:9px 12px;font-size:12.5px;font-family:'Noto Sans SC',sans-serif;color:#2e2b27;resize:none;height:38px;max-height:80px;line-height:1.5;outline:none}
+.inp-row textarea::placeholder{color:#a09890}
+.send-btn{width:38px;height:38px;border-radius:50%;background:#2e2b27;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.18s}
+.send-btn:hover{opacity:0.72}
+.send-btn svg{width:16px;height:16px;fill:#f7f4ee}
+
+/* ── Tabs ── */
+.tabs{display:flex;border-top:0.5px solid #ddd9cf;flex-shrink:0;z-index:5}
+.tab{flex:1;padding:12px 0;font-size:11px;color:#8a8278;text-align:center;cursor:pointer;background:#f7f4ee;letter-spacing:0.06em;transition:all 0.15s}
+.tab.on{color:#2e2b27;font-weight:700;border-top:2px solid #2e2b27;margin-top:-0.5px;background:#faf7f2}
+
+/* ── Highly Aesthetic Shareable Report Panel ── */
+.rp{
+  height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  display: none;
+  flex-direction: column;
+  background: #f5eedf;
+  padding: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+.rp::-webkit-scrollbar{width:0}
+
+/* Poster Card Frame */
+.poster-card{
+  background:#faf7f2;
+  border: 1px solid #2e2b27;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(46,43,39,0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  padding: 18px;
+  min-height: max-content;
+  flex-shrink: 0;
+}
+.poster-card::before{
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 6px;
+  background: repeating-linear-gradient(90deg, #8f3d2c, #8f3d2c 10px, #2e2b27 10px, #2e2b27 20px);
+}
+
+/* Hero banner */
+.r-hero{
+  padding: 16px 0 12px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  border-bottom: 1.5px dashed #c8c4b8;
+  margin-bottom: 14px;
+}
+.r-hero-eye{
+  font-size:8.5px;letter-spacing:0.25em;color:#8f3d2c;text-transform:uppercase;margin-bottom:6px;font-weight:700;
+  border: 1px solid #8f3d2c; padding: 2px 6px; border-radius: 4px;
+}
+.r-hero-badge{
+  font-family:'Noto Serif SC',serif;
+  font-size:23px;font-weight:900;color:#2e2b27;
+  letter-spacing:0.04em;line-height:1.2;
+  margin: 6px 0;
+}
+.r-hero-line{font-size:11.5px;color:#8a8278;line-height:1.5;max-width:280px;letter-spacing:0.02em}
+
+/* Aesthetic Widgets Grid */
+.r-body{display:flex;flex-direction:column;gap:12px;padding: 0;}
+
+.r-block{
+  background:#faf7f2;
+  border-radius:10px;
+  overflow:hidden;
+  border:1px dashed #dcd7cd;
+  animation:fi 0.3s ease forwards;opacity:0;
+  padding: 12px;
+}
+.r-block.flash{animation:flash-in 0.5s ease forwards}
+
+.r-block-head{
+  display:flex;align-items:center;gap:6px;
+  margin-bottom: 8px;
+}
+.r-icon{font-size:13px;line-height:1}
+.r-lbl{font-size:10px;letter-spacing:0.1em;color:#8f3d2c;text-transform:uppercase;font-weight:700}
+
+/* Specially Styled Energy Gauge for core drive */
+.drive-gauge-container{
+  margin-top: 8px;
+  height: 4px;
+  background: #ece6da;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.drive-gauge{
+  height: 100%;
+  width: 85%;
+  background: #8f3d2c;
+  border-radius: 2px;
+}
+
+/* Beautiful Typographical styles for parsed sections */
+.r-txt{
+  font-size:11.5px;
+  line-height:1.65;
+  color:#2e2b27;
+  background:#f6f1e5;
+  padding:10px 12px;
+  border-radius:6px;
+  font-weight: 500;
+}
+.r-txt-summary {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8f3d2c;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #dcd7cd;
+}
+.r-txt-insight {
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: #4a423a;
+  margin-bottom: 8px;
+}
+.r-txt-action {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #2e2b27;
+  background: #fdfaf5;
+  border: 1px dashed #dcd7cd;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-weight: 600;
+}
+
+/* WARNING BOX (Known Bug) styled like a retro warning label */
+.r-block.warning-block {
+  border: 1.5px solid #d4a373;
+  background: #fdfaf5;
+}
+.r-block.warning-block .r-lbl {
+  color: #c97a34;
+}
+.r-block.warning-block .r-txt {
+  background: #fcf1e3;
+  border-left: 3px solid #d4a373;
+  color: #5c4328;
+}
+
+/* Super Elegant Professional Diagnosis Certificate (Major Recommendation) */
+.r-block.major-recommendation {
+  border: 1.5px solid #8f3d2c;
+  background: #fcf8f2;
+  position: relative;
+}
+.r-block.major-recommendation::after{
+  content: 'RECOMMENDED';
+  position: absolute;
+  right: -10px; bottom: -5px;
+  font-size: 26px;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  color: rgba(143, 61, 44, 0.05);
+  transform: rotate(-10deg);
+  pointer-events: none;
+}
+.r-block.major-recommendation .r-block-head {
+  border-bottom: 1px solid #f3e5d8;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+.r-block.major-recommendation .r-lbl {
+  color: #8f3d2c;
+  font-size: 11px;
+}
+.r-block.major-recommendation .r-txt {
+  border-left: 3px solid #8f3d2c;
+  background: #f7eedf;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* Poster Footer */
+.poster-footer{
+  margin-top: 18px;
+  border-top: 1.5px dashed #c8c4b8;
+  padding-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.poster-barcode{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.barcode-lines{
+  display: flex;
+  gap: 1.5px;
+  height: 22px;
+  align-items: stretch;
+}
+.barcode-lines span{
+  background: #2e2b27;
+  width: 1.5px;
+}
+.barcode-lines span.wide{
+  width: 3px;
+}
+.barcode-lines span.thin{
+  width: 0.7px;
+}
+.barcode-num{
+  font-size: 6px;
+  font-family: monospace;
+  color: #8a8278;
+  letter-spacing: 1px;
+}
+.poster-stamp{
+  width: 46px; height: 46px;
+  border: 1px dashed #8f3d2c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-8deg);
+}
+.stamp-inner{
+  width: 38px; height: 38px;
+  border: 1px solid #8f3d2c;
+  border-radius: 50%;
+  color: #8f3d2c;
+  font-size: 7px;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.r-foot{padding:14px 16px 8px;font-size:9.5px;color:#a09890;text-align:center;letter-spacing:0.04em;line-height:1.6}
+.r-brand{font-family:'Noto Serif SC',serif;font-weight:700;color:#8f3d2c}
+
+/* ── Character card overlay ── */
+.overlay{
+  position:absolute;inset:0;
+  background:rgba(32,28,24,0.7);
+  display:flex;align-items:center;justify-content:center;
+  padding: 0 10px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.28s;
+  z-index:20;border-radius:42px;
+}
+.overlay.show{opacity:1;pointer-events:all}
+
+.card{
+  width:340px;background:#faf7f2;border-radius:24px;overflow:hidden;
+  transform:scale(0.9) translateY(20px);transition:all 0.35s cubic-bezier(0.34,1.3,0.64,1);
+  box-shadow:0 12px 36px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: 600px;
+}
+.overlay.show .card{transform:scale(1) translateY(0)}
+
+.card-top{padding:16px 18px 12px;border-bottom:0.5px solid #e8e3d8;display:flex;gap:12px;align-items:center}
+.card-av{
+  width:44px;height:44px;border-radius:50%;background:#8f3d2c;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Noto Serif SC',serif;font-size:15px;font-weight:700;color:#f7f4ee;
+  flex-shrink:0;letter-spacing:0.04em;
+  box-shadow:0 2px 8px rgba(143,61,44,0.25);
+}
+.card-name{font-family:'Noto Serif SC',serif;font-size:14.5px;font-weight:700;color:#2e2b27;letter-spacing:0.03em}
+.card-era{font-size:10px;color:#8a8278;margin-top:3px;letter-spacing:0.04em}
+
+/* Card Tabs */
+.card-tabs{
+  display:flex;
+  background:#ece6da;
+  border-bottom:0.5px solid #e8e3d8;
+}
+.card-tab{
+  flex:1;
+  padding:10px 0;
+  font-size:11px;
+  text-align:center;
+  cursor:pointer;
+  color:#8a8278;
+  font-weight:500;
+  transition:all 0.2s;
+}
+.card-tab.active{
+  color:#2e2b27;
+  font-weight:700;
+  background:#faf7f2;
+}
+
+.card-body{padding:14px 16px 16px;min-height:260px;display:flex;flex-direction:column;justify-content:flex-start}
+.card-content-pane{display:none;animation:fi 0.2s ease forwards; height: 100%;}
+.card-content-pane.active{display:flex; flex-direction:column; justify-content:space-between;}
+
+.card-quote{font-size:11.5px;line-height:1.7;color:#2e2b27;border-left:3px solid #8f3d2c;padding-left:10px;margin-bottom:8px;font-style:italic}
+
+/* Mini Chat UI inside Card (Pure aesthetic chat without noisy sender labels) */
+.card-chat-win{
+  background:#f2ece2;
+  border-radius:12px;
+  padding:8px;
+  height:140px;
+  overflow-y:auto;
+  margin-top:6px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  border:1px solid #e2dad0;
+  scroll-behavior:smooth;
+}
+.card-chat-win::-webkit-scrollbar{width:0}
+.card-chat-row{
+  display:flex;
+  flex-direction:column;
+  animation:fi 0.2s ease forwards;
+}
+.card-chat-row.char{align-items:flex-start}
+.card-chat-row.user{align-items:flex-end}
+.card-chat-bubble{
+  padding:8px 12px;
+  border-radius:12px;
+  font-size:11px;
+  line-height:1.5;
+  max-width:85%;
+  word-break:break-all;
+}
+.card-chat-bubble.char{background:#ece6da;color:#2e2b27;border-bottom-left-radius:2px}
+.card-chat-bubble.user{background:#8f3d2c;color:#f7f4ee;border-bottom-right-radius:2px}
+
+/* Card chat micro input */
+.card-chat-input-row{
+  display:flex;
+  gap:6px;
+  margin-top:8px;
+  align-items:center;
+}
+.card-chat-input{
+  flex:1;
+  border:1px solid #dcd7cd;
+  background:#fdfcf9;
+  border-radius:8px;
+  padding:6px 10px;
+  font-size:11px;
+  outline:none;
+  color:#2e2b27;
+  height:28px;
+}
+.card-chat-send{
+  background:#2e2b27;
+  border:none;
+  border-radius:8px;
+  width:28px;
+  height:28px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition: opacity 0.2s;
+}
+.card-chat-send:hover{opacity:0.8}
+.card-chat-send svg{width:11px;height:11px;fill:#fdfcf9}
+
+/* Character Card Tab 2 styling */
+.card-career-title{font-size:11px;font-weight:700;color:#8f3d2c;margin-bottom:4px;display:flex;align-items:center;gap:4px;}
+.card-career-desc{font-size:10.5px;line-height:1.6;color:#4a423a}
+
+/* Scroll area for Tab 2 inside character card */
+.card-scroll-pane {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 200px;
+  padding-right: 4px;
+}
+.card-scroll-pane::-webkit-scrollbar { width: 3px; }
+.card-scroll-pane::-webkit-scrollbar-thumb { background: #ece6da; border-radius: 2px; }
+
+.card-close{
+  width:100%;padding:13px;background:#ece6da;border:none;
+  font-size:12.5px;font-family:'Noto Sans SC',sans-serif;color:#2e2b27;
+  cursor:pointer;letter-spacing:0.06em;transition:all 0.15s;font-weight:700;
+  border-top:0.5px solid #e8e3d8;
+}
+.card-close:hover{background:#2e2b27;color:#f7f4ee}
+
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fo{from{opacity:1;transform:translateY(0) translateX(-50%)}to{opacity:0;transform:translateY(8px) translateX(-50%)}}
+
+</style>
+</head>
+<body>
+
+<div class="phone-wrap">
+  <div class="phone">
+    <div class="notch"><div class="notch-pill"></div></div>
+
+    <div class="hd">
+      <div class="hd-dot"></div>
+      <div class="hd-text">
+        <div class="hd-name">自我使用说明书</div>
+        <div class="hd-sub">高考志愿填报专属探索器</div>
+      </div>
+    </div>
+
+    <!-- chat -->
+    <div class="msgs" id="msgs"></div>
+
+    <!-- preset choices (dynamically populated) -->
+    <div class="choices-box" id="choices-box">
+      <div class="choices-title">
+        <span style="font-size:11px">💡</span> <span>提示：点击选项快捷回答，或在下方直接输入想法：</span>
+      </div>
+      <div class="choices-grid" id="choices-grid">
+        <!-- Buttons loaded by JS -->
+      </div>
+    </div>
+
+    <!-- chips (hidden until report) -->
+    <div class="chips" id="chips" style="display:none"></div>
+
+    <!-- report -->
+    <div class="rp" id="rp">
+      <div class="poster-card">
+        <div class="r-hero">
+          <div class="r-hero-eye">SPECSHEET REPORT</div>
+          <div class="r-hero-badge" id="r-badge">—</div>
+          <div class="r-hero-line" id="r-line">说明书生成后显示在这里</div>
+        </div>
+        <div class="r-body" id="r-blocks"></div>
+        
+        <!-- Aesthetic Poster Elements -->
+        <div class="poster-footer">
+          <div class="poster-barcode">
+            <div class="barcode-lines">
+              <span class="wide"></span><span></span><span class="thin"></span><span class="wide"></span><span></span><span class="thin"></span><span></span><span class="wide"></span>
+            </div>
+            <div class="barcode-num">VER.2026.GK</div>
+          </div>
+          <div class="poster-stamp">
+            <div class="stamp-inner">
+              <span>高考</span>
+              <span>合格证</span>
+              <span style="font-size:5px; scale: 0.85;">SPEC</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="r-foot">
+        这是你目前的探索版本。版本会随你的选择而刷新。<br>
+        <span class="r-brand">自我使用说明书 · 高考志愿探索版</span>
+      </div>
+    </div>
+
+    <!-- Bottom tab navigator -->
+    <div class="tabs" id="tabs-bar">
+      <div class="tab on" id="t-chat" onclick="switchTab('chat')">自我探索对话</div>
+      <!-- Locked status initially -->
+      <div class="tab locked" id="t-report" onclick="showLockedTip()" style="opacity: 0.45; cursor: not-allowed;">
+        🔒 说明书 (探索中)
+      </div>
+    </div>
+
+    <div class="inp-row" id="inp-row">
+      <textarea id="inp" placeholder="在此输入你的真实想法…" onkeydown="onKey(event)" oninput="autoH(this)"></textarea>
+      <button class="send-btn" onclick="send()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- character card overlay with two tabs -->
+  <div class="overlay" id="overlay">
+    <div class="card">
+      <div class="card-top">
+        <div class="card-av" id="c-av">AL</div>
+        <div>
+          <div class="card-name" id="c-name">Ada Lovelace</div>
+          <div class="card-era" id="c-era">数学家 · 1815–1852</div>
+        </div>
+      </div>
+      
+      <!-- Card Tab Bar -->
+      <div class="card-tabs">
+        <div class="card-tab active" id="ct-bio" onclick="switchCardTab('bio')">灵魂共鸣</div>
+        <div class="card-tab" id="ct-career" onclick="switchCardTab('career')">专业与现实</div>
+      </div>
+
+      <div class="card-body">
+        <!-- Tab 1: Bio & Live Character dialogue (Pure aesthetic chat without labels) -->
+        <div class="card-content-pane active" id="cc-bio">
+          <div>
+            <div class="card-quote" id="c-quote"></div>
+          </div>
+          <!-- Real-time conversation box with historical figure -->
+          <div class="card-chat-win" id="card-chat-win">
+            <!-- Dynamically populated dialogue bubbles -->
+          </div>
+          <div class="card-chat-input-row">
+            <input type="text" class="card-chat-input" id="card-chat-input" placeholder="跨时空提问TA..." onkeydown="onCardKey(event)">
+            <button class="card-chat-send" onclick="sendCardMsg()">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Tab 2: Character life intro combined with modern realities (Scrollable) -->
+        <div class="card-content-pane" id="cc-career">
+          <div class="card-scroll-pane">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <div class="card-career-title">📖 传奇生平经历</div>
+                <div class="card-career-desc" id="c-bio-history" style="color:#5c5246; margin-bottom: 4px;"></div>
+              </div>
+              <div>
+                <div class="card-career-title">🧭 匹配现代重点专业方向</div>
+                <div class="card-career-desc" id="c-majors" style="font-weight:700; color:#2e2b27; margin-bottom: 4px;"></div>
+              </div>
+              <div>
+                <div class="card-career-title">⚡ 行业生存现状与心理洗礼</div>
+                <div class="card-career-desc" id="c-reality"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="card-close" onclick="closeCard()">回到主探索</button>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+// ── 1. Priority Declaration & Configuration Global Constants ──
+const INITIAL_OPTIONS = [
+  '疯狂写代码/做设计',
+  '沉浸在写作/创作里',
+  '研究生物/自然/生命',
+  '钻研数学/逻辑/物理'
+];
+
+let currentStep = 1; // Exactly 5 steps to complete
+
+// ── API Credentials & Endpoint (set by user via config modal) ──
+const BASE_URL = 'https://api.deepseek.com/';
+const API_KEY = 'sk-c77db7602fea4a87879ec24f4b6fd5b3';
+const MODEL   = 'deepseek-v4-pro';
+const ENDPOINT = BASE_URL + 'chat/completions';
+
+// ── Historical Character Dataset mapped strictly to Image_fc3863 with realistic major pain points ──
+const CHARACTER_DB = {
+  'AL': {
+    name: "Ada Lovelace",
+    era: "计算机领域先驱 · 1815–1852",
+    promptName: "阿达",
+    bioHistory: "英国诗人拜伦之女。在19世纪被整个科学界和母亲告知'女性的感性心智不适合做复杂的差分计算'，但她顶着社会蔑视和常年瘫痪的病痛，写下了世界上第一段计算机程序。",
+    majors: "计算机科学与技术、软件工程、人工智能、数学与应用数学。",
+    reality: "这绝不是坐在CBD敲击键盘的体面生活。你将面临长达数小时甚至数十天静坐盯着冷光屏幕、在一万行代码中搜寻一个逗号错误的崩溃感。学习时需要忍受高数、离散数学、数据结构的超高智力摩擦。未来日常伴随高频的版本迭代与'不进则退'的技术贬值威胁，适合真正能享受绝对逻辑解密、不在乎现世掌声的沉浸式探索灵魂。"
+  },
+  'ZA': {
+    name: "张爱玲",
+    era: "文学巨匠 · 1920–1995",
+    promptName: "张爱玲",
+    bioHistory: "没有正统的学位光环加冕，家庭极力窒息其创作，但她在孤绝清冷的公寓里对自己的文学敏感有着病态的绝对笃定。她甘愿将生命剥开，在冷眼旁观中书写市井俗人。",
+    majors: "汉语言文学、戏剧影视文学、创意写作、新闻传播学。",
+    reality: "在AI写作秒级生成万字的时代，纯文字技能正在经历大清洗。学习中你必须直面毫无规律的经典背诵、枯燥的学术理论重构。毕业后你大概率面临为迎合商业算法而日产百篇同质化低质推文、公关稿的生存磨损。唯有骨子里流淌着病态的观察本能、不在意安稳生活的人，才能在这种精神沙化中守住独立。"
+  },
+  'LQ': {
+    name: "林巧稚",
+    era: "医学大师 · 1901–1983",
+    promptName: "林巧稚",
+    bioHistory: "中国妇产科学开拓者。顶着传统礼教'未婚女子染指产房大逆不道'的陈腐偏见和家人阻挠，毅然选择了当时极不受看好的妇产科。她终生未婚未育，几乎将产房当成生命的全部，亲手护送了5万名新生儿安全坠地。",
+    majors: "临床医学、儿科学、妇产科学、医学影像学。",
+    reality: "医学是典型的高壁垒、长周期的残酷修行，5年本科+3年规培只是起点。学习期间你将被药理学、解剖学等无尽的知识盲区考试淹没。日常工作更是高压力、高负荷的高速机器轮转：急诊紧急召回、半夜轮班、生死抉择往往在一瞬间发生。如果没有纯粹而健壮的利他精神，极易在中途崩溃、耗竭。"
+  },
+  'WJ': {
+    name: "吴健雄",
+    era: "物理学巨擘 · 1912–1997",
+    promptName: "吴健雄",
+    bioHistory: "被称为物理学第一夫人。在推翻宇称守恒的关键实验中做出了无懈可击的奠基工作，成果却未获得诺贝尔奖的署名认可。但对于她来说，科学探索本身的精密快感就是她最满意的答案。",
+    majors: "物理学、应用物理学、微电子科学与工程、材料物理。",
+    reality: "前沿硬核物理是冷板凳上的极限修行。学习中需要跨越量子力学、统计物理等极其摧毁自信的数理深渊。日常是在无菌或辐射屏蔽的实验基地里进行万次失败、零产出的精密调试。在现代，个人意志往往需要完全让渡给庞大而机械的科研攻关体系，适合对底层客观宇宙定理有纯粹到近乎强迫症般执念的科研种子。"
+  },
+  'ZY': {
+    name: "郑毓秀",
+    era: "传奇律师 · 1891–1959",
+    promptName: "郑毓秀",
+    bioHistory: "民国奇女子。在'女性进法庭执业被视为荒谬神话'的陈旧法权束缚中，她作为携带炸弹的革命党人、中国首位法学女博士，单枪匹马杀入政法体制，硬生生砸碎了旧规则。",
+    majors: "法学、国际法、知识产权、政治学与行政学。",
+    reality: "这绝非屏幕上西装革履、神采飞扬的法庭脱口秀。学习时需要死记硬背堆积如山的晦涩法条。执业后，你面临的是充满利益博弈、复杂的底层社会人情纠纷与程序拖延。你需要极高的情商在冰冷传统的法律大厦和人情关系网中长袖善舞，如果骨子里缺乏冷酷、滴水不漏的逻辑防线，很容易被行业高压吞噬。"
+  },
+  'JM': {
+    name: "约翰·梅纳德·凯恩斯",
+    era: "经济学巨匠 · 1883–1946",
+    promptName: "凯恩斯",
+    bioHistory: "现代宏观经济学奠基人。其理论在提出初期被古典自由学派疯狂围剿攻击多年，但他坚信国家宏观调控的科学性，最终在万马齐喑的经济萧条里挽救了整个世界的实体秩序。",
+    majors: "经济学、金融学、精算学、数据科学。",
+    reality: "这个方向极讲求冷酷的市场大局博弈。学习阶段你将饱受宏微观经济数学模型、复杂概率论、资产定价公式的折磨。未来你的生存状态是应对冷冰冰的数字模型和极具迷惑性的大众盲从。如果你容易受他人情绪、外界跟风影响，缺乏独立在宏观棋局上落子和逆风决策的定力，很容易在市场震荡中成为被收割的盲从者。"
+  },
+  'LM': {
+    name: "拉马努金",
+    era: "传奇数学家 · 1887–1920",
+    promptName: "拉马努金",
+    bioHistory: "出身于印度落后贫寒家庭。未受正规系统高等数学训练，全凭惊世骇俗的直观数感推演了数千个奇幻公式。一生超脱世俗条框约束，只为数学本身神圣的宇宙旋律狂欢。",
+    majors: "基础数学、数学与应用数学、理论物理学。",
+    reality: "基础学科是极其看重悟性天资的残忍修罗场。如果你缺乏超绝的灵性，学习抽象代数、实变函数时会痛苦到怀疑人生。科研之路不仅漫长清苦，在短期内更毫无实际用处的商业化现成利益，在学术体系里极易遭遇无果的学术空转。如果不是骨子里怀抱宗教般的真理赤诚，很容易在和一堆无序符号的博弈中走向自闭。"
+  },
+  'SM': {
+    name: "司马迁",
+    era: "史学泰斗 · 前145–前87",
+    promptName: "司马迁",
+    bioHistory: "因李陵事件惨遭宫刑。在尊严和身心被彻底撕碎的屈辱炼狱中，他隐忍下来，将余生孤注一掷熔铸于笔端，写出'史家之绝唱'的巨作《史记》，照亮华夏千年。",
+    majors: "历史学、考古学、古籍整理与研究、档案学。",
+    reality: "这是远离高回报、高商业化节奏的慢热学科。学习需要你花费数千小时啃读晦涩古文和斑驳文献。毕业后的出路大多流向沉寂边缘的研究所、博物馆、档案室。没有高薪和快钱的风口，你必须拥有超脱凡俗、能忍得住清贫、在千年长河中安放一颗孤零灵魂的浩瀚定力。"
+  },
+  'DW': {
+    name: "达尔文",
+    era: "博物学奠基人 · 1809–1882",
+    promptName: "达尔文",
+    bioHistory: "登上贝格尔号经受5年致命晕船与热带瘟疫折磨，在数十年的归纳后提出进化论。面对全英宗教和旧保守势力的妖魔化围剿打压，坚持用证据捍卫客观真理的铁律。",
+    majors: "生物科学、生态学、环境工程、野生动物与自然保护。",
+    reality: "这绝非坐在CBD明亮写字楼里的精致工作。往往伴随着高频的野外踏勘、泥泞的样本采集、风吹日晒与生理耐力极限。实验中你将面临极高难度的化学分析、微生物分类和极易失败的培养闭环，如果对基因、物种演化没有骨子里的狂热好奇，这类专业极易在日复一日的体力与繁复测序中消耗光所有热情。"
+  },
+  'TS': {
+    name: "特斯拉",
+    era: "电气发明先驱 · 1856–1943",
+    promptName: "特斯拉",
+    bioHistory: "划时代的电气巨天才。其交流电发明和多项伟大专利长期遭到爱迪生等商业帝国的强权侵夺和刻意抹杀。尽管晚景极其凄凉，但他纯粹的技术执念依然彻底点亮了现代电网世界。",
+    majors: "电气工程及其自动化、新能源科学与工程、自动化、微电子科学。",
+    reality: "重工理工方向是讲求极端精密、逻辑和体力的苦修。学习期间，你将和高深厚重的电磁场、数电模电、信号与系统反复磨砺。在现代工业大厂，你的创新大概率会被封装在大系统的某一个极其狭窄的小零件内，甚至因为商业和专利归属规则而无法获得应得的名利。需要极强的系统韧性和甘为无名基石的心胸。"
+  },
+  'ZL': {
+    name: "赵萝蕤",
+    era: "著名翻译家、学者 · 1912–1998",
+    promptName: "赵萝蕤",
+    bioHistory: "中国现代翻译丰碑。顶着战乱颠沛，凭无上人文学养首度精准译出难度极高、充斥着现代主义碎片化的文学天书《荒原》，撑起学界骨脊，一生淡泊名利，隐于市井。",
+    majors: "英语文学、比较文学、翻译学、汉语言文学。",
+    reality: "在人工智能秒级翻译、精准度极速迭代的今天，纯语言工具面临前所未有的贬值危机。选择文学和翻译，意味着你的学习日常需要直面超大体量、令人窒息的跨文化批判阅读、学术史梳理。未来工作极其讲求人文学养的极慢速积淀，没有快钱套利，必须有守卫精神城堡、只为文字里那一点点人性温度而深耕的崇高人文定力。"
+  }
+};
+
+// ── System Prompt for the Main Discovery Guide ──
+const SYSTEM = `你是'自我使用说明书'，帮助高考生在填志愿前生成专属自我认知与专业选择探索报告的助手。
+
+你通过深度对话追问，层层剖析，并提供4个超精简的预设选项辅助。
+
+说话原则：
+- 语言简短而锋利，不要说废话，不长篇大论。
+- 每次对话只问一个问题。每轮回复控制在80字以内，追问控制在40字以内。
+- 每次追问后，必须提供不多于4个的极简预设选项，格式严格如下：
+  【选项】选项A||选项B||选项C||选项D
+- 每个选项字符严格控制在8个汉字以内！必须极为精简（如：'追求逻辑'、'人情博弈'、'独自研究'、'救死扶伤'）。
+- 每次提问前，必须先对用户上一次回答做一句真实的短评，绝不能直接跳到下一个提问。
+- 提问必须是具体的现实场景或抉择困境，让用户有代入感，绝不能问抽象概念。
+- 如果用户的回答比较浅或者模糊，可以用一个追问进一步挖深，再进入下一维度。
+
+你要依次挖完以下5个领域：
+A. 核心驱动：寻找内在能量来源。
+   首问固定："在聊专业前，我想先向你确认一件事——上一次你做一件事做到忘记时间、甚至连饭都忘了吃，具体是在做什么？"
+   若回答模糊，追问一个场景：比如"你在做这件事的时候，是有人在看着你才兴奋，还是一个人独自沉迷的时候更带劲？"
+
+B. 爱好与专业的关系：挖出用户对'把爱好当职业'的真实态度和顾虑。
+   可用以下任一场景提问（选最贴近用户情况的）：
+   - "如果把你最喜欢做的事变成每天打卡的8小时KPI，你会觉得窒息还是更有干劲？"
+   - "你更怕的是：毕业后发现工作跟兴趣完全无关，还是发现工作把兴趣榨干了？"
+   - "有人说：喜欢的东西不要碰专业，留着当退路。你认同吗，为什么？"
+
+C. 想要的生活方式（人物和专业匹配）：根据用户喜好，匹配一位历史人物，触发人物卡片。
+   人物卡片格式（每个字段严格按规定）：
+   【人物卡片】人物真实姓名||职业与年代（与数据库一致）||两字母缩写（必须严格是 AL/ZA/LQ/WJ/ZY/JM/LM/SM/DW/TS/ZL 之一，这是最关键字段！）||第一人称独白（50字内）||一句反问考生的话（30字内）
+   ⚠️ 重要：两字母缩写必须准确对应人物，系统会用它从数据库读取所有标准信息，名字和年代只做展示参考。
+   
+   匹配规则（硬性对应）：
+   - 计算机/程序/算法/代码 → AL（Ada Lovelace）
+   - 文学/写作/小说/故事 → ZA（张爱玲）
+   - 医学/医生/救治/药学 → LQ（林巧稚）
+   - 物理/精密实验/半导体/硬理工 → WJ（吴健雄）
+   - 法律/律师/辩论/正义 → ZY（郑毓秀）
+   - 金融/经济/投资/大局博弈 → JM（凯恩斯）
+   - 数学/逻辑推导/纯数学 → LM（拉马努金）
+   - 历史/考古/档案/古籍 → SM（司马迁）
+   - 生物/生态/自然/野外 → DW（达尔文）
+   - 电气/电机/发明/新能源 → TS（特斯拉）
+   - 英语/翻译/外语/跨语言 → ZL（赵萝蕤）
+
+D. 发光条件：探索用户在什么环境下能最高效运作。
+   必须用一个高度具象的冲突场景（二选一），比如：
+   - "给你两个大学场景选一个：A：课程安排满满、考试有标准答案、每次都能拿到高分；B：课程几乎没人管你，全靠自驱，可能挂科也可能做出让导师惊艳的东西。你选哪个？"
+   - "你更享受的工作状态：独自一人在深夜把一个复杂问题彻底搞透，还是和一群人七嘴八舌头脑风暴直到某一刻迸发火花？"
+
+E. 已知Bug（耗电模式）：探索何种状态会迅速消耗其精力。
+   必须用具象场景引导，比如：
+   - "想象你在做一个团队项目，有人一直在改方向、否定你的思路，你的第一反应是什么？"
+   - "什么情况会让你觉得一天白过了、特别空虚——是什么都没做完，还是做了很多但感觉没意义？"
+   - "你最讨厌的一种人或状态是什么？这往往说明你的性格暗角在哪里。"
+
+说明书输出格式（终局标志）：
+当挖完五个维度后，你必须生成说明书。为了利于社交传播和启发性，每个维度必须输出结构化的内容（严禁流于表面、千篇一律地重复前面的废话，必须一针见血剖析性格痛点，给用户兴奋感）：
+每个维度的结构格式必须为：【概括】一句话极具特性的总结概括。【深度解析】测评结果般的启发式解析，多给用户一些兴奋点，解构性格暗角。【行动启示】指引高考志愿和自我发展的切实落地行动点。
+你必须输出符合上述格式的整段结构化说明书：
+【说明书】专属称号||一句话Tagline||核心驱动（需符合【概括】【深度解析】【行动启示】结构）||发光条件（需符合该结构）||使用须知（需符合该结构）||已知Bug（需符合该结构）||建议报考专业方向与现实图景说明（说明中必须包含2-3个现代具体专业，并指出这些专业在现实中毕业后的就业状态/结合匹配历史人物遭遇给出需要做的心理洗礼与3个具体落地学习困难）
+
+禁止：不说"我非常理解你的感受"之类的敷衍词，不连续提两个问题。`;
+
+// ── System Prompts for Historical Characters Mini-Chat inside the Overlay Card (Strict Era Constraint) ──
+const CHAR_SYSTEM_PROMPTS = {
+  'AL': "你是阿达·洛芙莱斯(Ada Lovelace)。你生活在19世纪英国。你【绝对不知道】高考、志愿填报、选科、大学、绩点、大厂等21世纪词汇。如果你被问到这类现代词汇，请用你的齿轮分析机、手写算法草稿、伦敦沙龙、拜伦式浪漫、疾病以及你那个时代对女性的陈旧束缚等经历和隐喻来给现代学生解答。用充满冷僻、极具智慧和深沉逻辑性的冷傲口吻。控制在45字内。你的核心命题是：我的价值暂时不被看见怎么办？",
+  'ZA': "你是作家张爱玲。你生活在民国及近现代。你【绝对不要】在口语中使用'高考选科'、'高考志愿'等现代语。结合你在上海孤寂公寓里的笔耕、对十里洋场市民人性的冷眼剖析、上海香港两地流离和清冷自守，给学生一些极其清醒、甚至近乎残酷一针见血的生活直觉。用极其冷艳、高调而薄凉的文人语气。控制在45字内。你的核心命题是：我到底想过什么样的人生？",
+  'LQ': "你是妇产科医生林巧稚。你【绝对不谈】高考志愿和大学绩点，只谈生命本身的无私敬畏和坚守。结合你在动荡旧中国协和产房、亲手接生五万婴儿、彻夜守护和对母亲儿童悲悯深沉的母性长辈关怀，温暖且极其耐心地解答现代学生的疑惑。控制在45字内。你的核心命题是：我该怎么选专业？",
+  'WJ': "你是物理学家吴健雄。你【绝不能谈论】高考或志愿填报。结合你在二十世纪实验室里面对冷冰冰仪器、日复一日校对极精密物理数据、验证李杨假说时的漫长寂寞与精密求真态度，用极具实验理性、科学坚韧性的口吻，教导学生什么是极致的深耕。控制在45字内。你的核心命题是：我想做的事值不值得坚持？",
+  'ZY': "你是女法官郑毓秀。你生活在民国时期。你【绝对不提】高考选科和分数。结合你曾作为刺客运送炸弹、成为中国首位法学女博士、女法官和打破森严旧官僚法治体制的大开大合魄力经历，用雷厉风行、飒爽不向规则低头的干练态度，指引学生在世俗荆棘规则里长袖善舞、热血突围。控制在45字内。你的核心命题是：规则重要还是改变规则重要？",
+  'JM': "你是约翰·梅纳德·凯恩斯(John Maynard Keynes)。你生活在20世纪英国。你【绝不知道】2026年中国的高考志愿政策。请结合你作为学者挑战古典放任自流经济学派、提出《就业、利息和货币通论》引起世界哗然、用宏观框架拯救萧条世界危机的深邃眼界。用理智、带着英伦绅士和宏观博弈气息的口吻给考生面对逆风时的决策智慧。限制在45字内。你的核心命题是：大家都反对的时候怎么办？",
+  'LM': "你是数学天才拉马努金。你生活在20世纪初。你【绝对无视】现代大学指标或志愿等规矩。你坚信每一道奇异公式都是女神娜玛卡尔梦境中的恩赐。结合你独自推演数千梦中公式、不服学术规矩而孤身在黑板前燃烧智力的奇幻孤独经历，用一种充满直觉感悟、神秘而深邃的口吻与现代考生对话。控制在45字内。你的核心命题是：我没有天赋怎么办？",
+  'SM': "你是司马迁。你生活在汉武帝时期。你【完全不懂】现代高考志愿、计算机或互联网等现代词汇。结合你惨受宫刑奇耻大辱、为了著写《史记》忍辱负重度过余生的壮烈经历。用历经风雨、天地乾坤尽在眼底的沧桑历史观和教诲大尺度的浩然正气，开导学生看待生命的方向。控制在45字内。你的核心命题是：我该坚持还是放弃？",
+  'DW': "你是博物学家达尔文。你生活在19世纪。你【完全不知道】现代高考选科或都市大厂。结合你登上贝格尔号晕船5年、攀登荒山孤岛野外采样标本、撰写《物种起源》时的狂热好奇与病痛挣扎经历，用充满冒险家热血、虔诚观察自然演化的兴奋态度指引学生去亲吻自然泥土。控制在45字内。你的核心命题是：外界声音太多怎么办？",
+  'TS': "你是电气发明家尼古拉·特斯拉。你的一生充满了与交流电相伴的惊世发明，却多次遭遇爱迪生等强权大鳄的无情排挤和署名侵夺。你生活在19到20世纪。你【完全不懂】现代高考志愿。请用你对电学、磁场和无线能量纯粹而神圣、不受世俗金钱与虚名羁绊的傲骨孤洁精神解答考生的挫折，语言锋利纯净。限制在45字内。你的核心命题是：不被认可还有意义吗？",
+  'ZL': "你是外国文学翻译家赵萝蕤。你【完全不懂】现代选科分数，你曾翻译艾略特的天书《荒原》引起文坛侧目。你一生经历战乱波劫，却淡泊名利，对学术与文字翻译怀有高贵清澈的精神。请结合你隐入尘烟、默默治学、甘于人后的高尚人生，给考生谈谈面对外界浮躁时，知识与心智探索的真正价值。控制在45字内。你的核心命题是：学习的价值到底是什么？"
+};
+
+const DIM_ICONS = {
+  '核心驱动': '🔥',
+  '发光条件': '💡',
+  '使用须知': '📌',
+  '已知 Bug': '⚡',
+};
+
+let history = [];
+let waiting = false;
+let cardShown = false;
+let pendingCardQ = '';   
+let reportDone = false;
+let lastReport = null;
+
+// Character Card Dialogue States
+let activeCharCode = '';
+let charHistory = [];
+let charChatWaiting = false;
+
+// Double-safety Storage for current parsed options to flow flawlessly upon card close
+let pendingOptions = [];
+
+const msgsEl      = document.getElementById('msgs');
+const inp         = document.getElementById('inp');
+const chipsEl     = document.getElementById('chips');
+const choicesBox  = document.getElementById('choices-box');
+const choicesGrid = document.getElementById('choices-grid');
+
+const cardChatWin = document.getElementById('card-chat-win');
+const cardChatInp = document.getElementById('card-chat-input');
+
+function autoH(el){ el.style.height='38px'; el.style.height=Math.min(el.scrollHeight,80)+'px'; }
+function onKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
+function onCardKey(e){ if(e.key==='Enter'){e.preventDefault();sendCardMsg();} }
+
+function addMsg(role, html, delay=0){
+  return new Promise(res=>{
+    setTimeout(()=>{
+      const row = document.createElement('div');
+      row.className = 'row '+role;
+      const bub = document.createElement('div');
+      bub.className = 'bub '+role;
+      // Convert newlines to <br> so scene questions display clearly
+      bub.innerHTML = html.replace(/\n/g, '<br>');
+      row.appendChild(bub);
+      msgsEl.appendChild(row);
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+      res();
+    }, delay);
+  });
+}
+
+function showTyping(){
+  const row = document.createElement('div');
+  row.className = 'typing-row'; row.id = 'tr';
+  row.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  msgsEl.appendChild(row);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+function removeTyping(){ const e=document.getElementById('tr'); if(e)e.remove(); }
+
+async function send(){
+  if(waiting) return;
+  const text = inp.value.trim();
+  if(!text) return;
+  inp.value=''; inp.style.height='38px';
+  
+  // Disable options during generation
+  choicesBox.style.opacity = '0.5';
+  choicesBox.style.pointerEvents = 'none';
+
+  // 1. Ensure user message bubble is strictly inserted first
+  await addMsg('user', esc(text));
+  history.push({role:'user', content:text});
+  
+  // 2. Spawn typing dots strictly under the user bubble
+  waiting = true; 
+  showTyping();
+
+  // Dialog stage turn limiter configuration
+  // Steps: 1-2=核心驱动(追问), 3-4=爱好与专业(追问), 5=人物卡片触发, 6-7=发光条件(追问), 8-9=已知Bug(追问), 10+=生成说明书
+  let stepGuidance = "";
+  if (!reportDone) {
+    if (currentStep === 1) {
+      stepGuidance = "\n【第1步：核心驱动。对用户的回答做一句真实短评，然后追问一个更具体的场景来深挖驱动力——比如：做这件事时你是一个人沉迷更带劲，还是要有人一起才兴奋？附带【选项】格式（4个以内，每个8字以内）。】";
+    } else if (currentStep === 2) {
+      stepGuidance = "\n【第1步追问回合。对用户的回答做一句短评，然后切入第2步：爱好与专业的关系。用一个具体冲突场景提问，比如：把你最喜欢的事变成每天打卡的8小时KPI，你会觉得窒息还是更有干劲？或者问：你更怕毕业后工作跟兴趣无关，还是工作把兴趣榨干了？附带【选项】格式。】";
+    } else if (currentStep === 3) {
+      stepGuidance = "\n【第2步追问回合。对用户回答做一句锋利短评，继续深挖爱好与职业的真实关系。可以问：有人说喜欢的事不要碰专业，留着当退路——你认同吗？或者追问：你担心的是'热爱被消耗'还是'没有热爱'？附带【选项】格式。】";
+    } else if (currentStep === 4) {
+      stepGuidance = "\n【第3步：生活方式与人物匹配。对用户的整体特质做一句画像式总结，然后匹配一位历史人物，触发【人物卡片】机制。【人物卡片】格式严格为：人物真实姓名||职业与年代||两字母缩写（必须严格是 AL/ZA/LQ/WJ/ZY/JM/LM/SM/DW/TS/ZL 之一，这是最关键字段）||第一人称独白（50字内，充满哲理和力量感）||一句对考生的灵魂反问（30字内）。硬性匹配规则：文学/写作/创作→ZA；计算机/程序/代码→AL；医学/医生→LQ；物理/实验/半导体→WJ；法律/律师→ZY；金融/经济/投资→JM；数学/逻辑推导→LM；历史/考古→SM；生物/生态/野外→DW；电气/发明/新能源→TS；英语/翻译→ZL。不要附带【选项】，人物卡片关闭后系统会自动进入下一步。】";
+    } else if (currentStep === 5) {
+      stepGuidance = "\n【第4步：发光条件。人物卡片已结束，现在探索用户在什么环境下能最高效运作。用一个高度具象的二选一冲突场景提问，比如：\nA. 课程排满、有标准答案、每次能拿高分的温室；\nB. 几乎没人管、靠自驱、可能挂科也可能做出让人惊艳东西的荒野。\n你会选哪个？\n气泡里场景选项必须换行显示，清晰呈现。附带【选项】格式（精简到4字以内：如【温室高分】|【荒野自驱】）。】";
+    } else if (currentStep === 6) {
+      stepGuidance = "\n【第4步追问。对用户的发光条件做深度解读，追问一个更细的场景——比如：你更享受的工作状态是独自深夜把一个复杂问题彻底搞透，还是和一群人头脑风暴直到某一刻迸发火花？附带【选项】格式。】";
+    } else if (currentStep === 7) {
+      stepGuidance = "\n【第5步：已知Bug和耗电模式。简评用户的发光特质，然后用一个具象场景挖耗电模式——比如：想象你在做团队项目，有人一直改方向否定你思路，你的第一反应是什么？或：什么情况会让你觉得一天白过了？附带【选项】格式。】";
+    } else if (currentStep === 8) {
+      stepGuidance = "\n【第5步追问。对用户的Bug信号做一句穿透性的解读，继续追问：你最讨厌的一种人或状态是什么？这往往暴露你最深的性格暗角。附带【选项】格式。】";
+    } else if (currentStep >= 9) {
+      stepGuidance = "\n【终局】现在严格按以下单一格式输出，不要对话不要解释，直接输出：\n【说明书】专属称号||一句话Tagline||核心驱动【概括】概括内容【深度解析】深度解析内容【行动启示】行动启示内容||发光条件【概括】概括内容【深度解析】深度解析内容【行动启示】行动启示内容||使用须知【概括】概括内容【深度解析】深度解析内容【行动启示】行动启示内容||已知Bug【概括】概括内容【深度解析】深度解析内容【行动启示】行动启示内容||专业方向：2-3个具体专业||结合匹配人物的挫折经历给出3个现实学习困难和就业洗礼\n【说明书】必须出现在开头第一行！用||分隔7个字段！【概括】【深度解析】【行动启示】用中文全角括号！";
+
+    }
+    currentStep++;
+  } else {
+    stepGuidance = "\n【说明书已生成。请友好地根据用户的补充信息或对推荐专业方向的咨询进行个性化探讨和简练解答。不要提出新的测试题，也不需要重新输出【说明书】标签。语言简练、针对性强。】";
+  }
+
+  try{
+    const apiMessages = [{role:'system', content:SYSTEM}, ...history];
+    apiMessages.push({role:'system', content:stepGuidance});
+
+    const res = await fetch(ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
+      body: JSON.stringify({
+        model: MODEL, max_tokens: 4096, temperature: 0.72, thinking: {"type":"disabled"},
+        messages: apiMessages
+      })
+    });
+    const data = await res.json();
+    removeTyping();
+    if(data.error){ addMsg('ai', esc(data.error.message||'出错了，请重试')); waiting=false; return; }
+    const raw = data.choices?.[0]?.message?.content || '出了点问题，请重试。';
+    history.push({role:'assistant', content:raw});
+    processResponse(raw);
+  } catch(e){
+    removeTyping();
+    addMsg('ai','网络请求失败，请检查网络后重试。');
+  }
+  waiting = false;
+}
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function processResponse(raw){
+  // ── Double-Safety Parse options and character cards ──
+  let displayMessage = raw;
+  let parsedOptions = [];
+  let cardData = null;
+
+  // Extract Option tag safely
+  if(displayMessage.includes('【选项】')){
+    const optSplit = displayMessage.split('【选项】');
+    displayMessage = optSplit[0].trim();
+    const optsStr = optSplit[1].trim();
+    parsedOptions = optsStr.split('||').map(s => s.trim()).filter(Boolean);
+  }
+
+  // Ensure options strictly length <= 4
+  if(parsedOptions.length > 4) {
+    parsedOptions = parsedOptions.slice(0, 4);
+  }
+  pendingOptions = parsedOptions; // Keep in cache for seamless card closing flow
+
+  // Extract Character Card safely
+  if(displayMessage.includes('【人物卡片】')){
+    const cardSplit = displayMessage.split('【人物卡片】');
+    displayMessage = cardSplit[0].trim();
+    const cardFields = cardSplit[1].split('||').map(s => s.trim());
+    if(cardFields.length >= 5){
+      cardData = {
+        name: cardFields[0],
+        era: cardFields[1],
+        code: cardFields[2],
+        quote: cardFields[3],
+        question: cardFields[4].replace(/【选项】[\s\S]*/, '').trim() // Strip nested tags if any
+      };
+    }
+  }
+
+  // Render options only if not matched card (as card overlay takes focus)
+  if(!cardData && !reportDone) {
+    renderChoices(parsedOptions);
+  } else {
+    choicesBox.style.display = 'none';
+  }
+
+  
+  // ── Detect exploration completion (fallback for DeepSeek) ──
+  if(!cardData && !reportDone && 
+     (displayMessage.includes('五个维度已全部挖完') || 
+      displayMessage.includes('五个维度已挖完') ||
+      displayMessage.includes('专属自我使用说明书'))) {
+    // The AI is saying it's done but might not output correct format
+    // Instead of showing this response, trigger a follow-up to get proper format
+    if(displayMessage.includes('【说明书】')) {
+      // It has proper format, let processResponse handle it normally
+    } else {
+      // Remove the current response from display and trigger format generation
+      triggerFinalReport();
+      return;
+    }
+  }
+// ── Trigger Character Card Display ──
+  if(cardData && !cardShown){
+    if(displayMessage) addMsg('ai', esc(displayMessage));
+    pendingCardQ = cardData.question;
+    
+    hydrateCard(cardData.name, cardData.era, cardData.code, cardData.quote, cardData.question);
+    showCard();
+    cardShown = true;
+    return;
+  }
+
+  // ── Trigger Report Generation (The Specs Sheet) ──
+  if(displayMessage.includes('【说明书】')){
+    const after = displayMessage.split('【说明书】')[1];
+    const parts = after.split('||');
+    if(parts.length >= 7){
+      const rd = {
+        badge:parts[0].trim(), tagline:parts[1].trim(),
+        drive:parts[2].trim(), glow:parts[3].trim(),
+        note:parts[4].trim(), bug:parts[5].trim(), 
+        major:parts[6].trim()
+      };
+      lastReport = rd;
+      renderReport(rd, false);
+      addMsg('ai','✨ 专属自我使用说明书已绘制完成！解锁下方的"我的使用说明书"查看深度志愿指南。');
+      reportDone = true;
+      choicesBox.style.display = 'none';
+      
+      unlockReportTab();
+      setTimeout(() => {
+        switchTab('report');
+      }, 1500);
+
+      showChips(['我还有想补充的','解释专业','重新来一遍']);
+      return;
+    }
+  }
+
+  // ── Standard Message Output ──
+  const clean = displayMessage.replace(/【[^】]*】[\s\S]*/,'').trim() || displayMessage;
+  addMsg('ai', esc(clean));
+}
+
+// ── Choices Grid Renderer ──
+function renderChoices(optionsArray){
+  choicesBox.style.opacity = '1';
+  choicesBox.style.pointerEvents = 'all';
+  
+  if(!optionsArray || optionsArray.length === 0){
+    choicesBox.style.display = 'none';
+    return;
+  }
+  
+  choicesBox.style.display = 'flex';
+  choicesGrid.innerHTML = '';
+  optionsArray.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.onclick = () => {
+      inp.value = opt;
+      send();
+    };
+    choicesGrid.appendChild(btn);
+  });
+}
+
+// ── Card Interaction System ──
+let currentActiveCardTab = 'bio';
+
+function switchCardTab(tabName) {
+  currentActiveCardTab = tabName;
+  document.getElementById('ct-bio').className = 'card-tab' + (tabName === 'bio' ? ' active' : '');
+  document.getElementById('ct-career').className = 'card-tab' + (tabName === 'career' ? ' active' : '');
+  
+  document.getElementById('cc-bio').className = 'card-content-pane' + (tabName === 'bio' ? ' active' : '');
+  document.getElementById('cc-career').className = 'card-content-pane' + (tabName === 'career' ? ' active' : '');
+}
+
+function hydrateCard(name, era, code, quote, question){
+  activeCharCode = code.trim();
+  
+  // Always use CHARACTER_DB as the single source of truth for name/era/majors/reality
+  // to prevent any mismatch between AI-generated card data and the local database
+  const info = CHARACTER_DB[activeCharCode] || { name: name, era: era, promptName: name, bioHistory: '暂无传奇经历介绍', majors: '现代相关专业', reality: '请继续对话。' };
+  const displayName = info.name;  // Override AI output with canonical DB name
+  const displayEra  = info.era;   // Override AI output with canonical DB era
+
+  // Avatar: show the character's Chinese name initials if available, else code
+  const avatarText = info.promptName ? info.promptName.slice(0, 2) : activeCharCode;
+  document.getElementById('c-av').textContent    = avatarText;
+  document.getElementById('c-name').textContent  = displayName;
+  document.getElementById('c-era').textContent   = displayEra;
+  document.getElementById('c-quote').textContent = '\u300e' + quote + '\u300f';
+
+  document.getElementById('c-bio-history').textContent = info.bioHistory;
+  document.getElementById('c-majors').textContent = info.majors;
+  document.getElementById('c-reality').textContent = info.reality;
+
+  // Clear & initialize live mini dialogue window (Fully clean UI - no sender labels)
+  cardChatWin.innerHTML = '';
+  charHistory = [
+    { role: 'assistant', content: quote },
+    { role: 'assistant', content: question }
+  ];
+  
+  addCardChatBubble('char', quote);
+  addCardChatBubble('char', question);
+
+  switchCardTab('bio');
+}
+
+function addCardChatBubble(sender, text) {
+  const row = document.createElement('div');
+  row.className = `card-chat-row ${sender}`;
+  row.innerHTML = `<div class="card-chat-bubble ${sender}">${esc(text)}</div>`;
+  cardChatWin.appendChild(row);
+  cardChatWin.scrollTop = cardChatWin.scrollHeight;
+}
+
+// ── Live mini dialogue inside card ──
+async function sendCardMsg() {
+  if (charChatWaiting) return;
+  const text = cardChatInp.value.trim();
+  if (!text) return;
+  cardChatInp.value = '';
+
+  addCardChatBubble('user', text);
+  charHistory.push({ role: 'user', content: text });
+  
+  charChatWaiting = true;
+  const loader = document.createElement('div');
+  loader.className = 'card-chat-row char';
+  loader.id = 'card-loader';
+  loader.innerHTML = `<div class="card-chat-bubble char">正在思索...</div>`;
+  cardChatWin.appendChild(loader);
+  cardChatWin.scrollTop = cardChatWin.scrollHeight;
+
+  try {
+    const charSystemPrompt = CHAR_SYSTEM_PROMPTS[activeCharCode] || `你是${CHARACTER_DB[activeCharCode]?.name || '一位导师'}。简洁解答提问，每次回答45字以内。`;
+    const res = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
+      body: JSON.stringify({
+        model: MODEL, max_tokens: 1024, temperature: 0.72, thinking: {"type":"disabled"},
+        messages: [{ role: 'system', content: charSystemPrompt }, ...charHistory]
+      })
+    });
+    const data = await res.json();
+    const l = document.getElementById('card-loader'); if (l) l.remove();
+    
+    if (data.error) {
+      addCardChatBubble('char', '时空思绪波段不稳，让我理一理。');
+    } else {
+      const reply = data.choices?.[0]?.message?.content || '嗯...说得深奥了。';
+      charHistory.push({ role: 'assistant', content: reply });
+      addCardChatBubble('char', reply);
+    }
+  } catch (e) {
+    const l = document.getElementById('card-loader'); if (l) l.remove();
+    addCardChatBubble('char', '信号微弱，请重试一遍。');
+  }
+  charChatWaiting = false;
+}
+
+function showCard(){
+  document.getElementById('overlay').classList.add('show');
+}
+
+// ── Fast card close: trigger step4 via API call ──
+function closeCard(){
+  document.getElementById('overlay').classList.remove('show');
+  pendingCardQ = '';
+  pendingOptions = [];
+  // Trigger a fresh AI turn to ask the step4 发光条件 question
+  triggerNextStep();
+}
+
+async function triggerNextStep(){
+  if(waiting) return;
+  waiting = true;
+  showTyping();
+
+  // Build a silent system nudge to move to the next step
+  const stepGuidance = "\n【人物卡片已关闭。现在直接进入第4步：发光条件探索。用一个高度具象的二选一冲突场景提问，场景选项在气泡内必须换行显示，让用户看清楚。比如：\nA. 课程排满、有标准答案、每次能拿高分的温室环境；\nB. 几乎没人管、靠自驱、可能挂科也可能做出让人惊艳东西的荒野环境。\n你更适合哪种？\n附带【选项】格式（精简4字：如【温室高分】||【荒野自驱】||【视情况而定】||【两者都要】）。不要再提人物卡片或让用户选人物。】";
+
+  try {
+    const apiMessages = [{role:'system', content:SYSTEM}, ...history];
+    apiMessages.push({role:'system', content:stepGuidance});
+    const res = await fetch(ENDPOINT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
+      body: JSON.stringify({model:MODEL, max_tokens:2048, temperature:0.72, thinking:{"type":"disabled"}, messages:apiMessages})
+    });
+    const data = await res.json();
+    removeTyping();
+    if(data.error){ addMsg('ai', esc(data.error.message||'出错了')); waiting=false; return; }
+    const raw = data.choices?.[0]?.message?.content || '请继续分享你的想法。';
+    history.push({role:'assistant', content:raw});
+    processResponse(raw);
+  } catch(e){
+    removeTyping();
+    addMsg('ai','网络请求失败，请检查网络后重试。');
+  }
+  waiting = false;
+}
+
+
+// ── Fallback: trigger final report generation when AI doesn't output correct format ──
+let reportRetryCount = 0;
+async function triggerFinalReport() {
+  if(waiting || reportRetryCount > 2) return;
+  reportRetryCount++;
+  waiting = true;
+  showTyping();
+  
+  try {
+    const finalPrompt = "现在立刻输出完整【自我使用说明书】。只输出以下格式，不要对话不要解释不要任何其他文字：\n【说明书】专属称号||一句话Tagline||核心驱动【概括】概括【深度解析】深度解析【行动启示】行动启示||发光条件【概括】概括【深度解析】深度解析【行动启示】行动启示||使用须知【概括】概括【深度解析】深度解析【行动启示】行动启示||已知Bug【概括】概括【深度解析】深度解析【行动启示】行动启示||2-3个具体专业方向||现实图景说明及心理洗礼\n\n必须使用【说明书】开头！用||分隔！不要在前面加任何对话！";
+    
+    apiMessages.push({role:'system', content: finalPrompt});
+    const apiMessages = [{role:'system', content: finalPrompt}];
+    const res = await fetch(ENDPOINT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
+      body: JSON.stringify({model:MODEL, max_tokens:4096, temperature:0.4, thinking:{"type":"disabled"}, messages:apiMessages})
+    });
+    const data = await res.json();
+    removeTyping();
+    if(data.error){ addMsg('ai', esc(data.error.message||'出错了')); waiting=false; return; }
+    const raw = data.choices?.[0]?.message?.content || '';
+    if(raw.includes('【说明书】')) {
+      history.push({role:'assistant', content:raw});
+      processResponse(raw);
+    } else {
+      addMsg('ai', '✨ 探索已完成！你的专属自我使用说明书已准备就绪。');
+      waiting = false;
+    }
+  } catch(e) {
+    removeTyping();
+    addMsg('ai','✨ 探索已完成！请继续对话以生成说明书。');
+  }
+  waiting = false;
+}
+// ── Floating Lock Tip inside Phone ──
+function showLockedTip() {
+  const existing = document.getElementById('lock-tip');
+  if(existing) return;
+
+  const tip = document.createElement('div');
+  tip.id = 'lock-tip';
+  tip.style.position = 'absolute';
+  tip.style.bottom = '84px';
+  tip.style.left = '50%';
+  tip.style.transform = 'translateX(-50%)';
+  tip.style.background = 'rgba(46, 43, 39, 0.95)';
+  tip.style.color = '#f7f4ee';
+  tip.style.padding = '10px 18px';
+  tip.style.borderRadius = '20px';
+  tip.style.fontSize = '11.5px';
+  tip.style.zIndex = '99';
+  tip.style.whiteSpace = 'nowrap';
+  tip.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
+  tip.style.animation = 'fi 0.2s cubic-bezier(0.34, 1.3, 0.64, 1) forwards';
+  tip.innerHTML = '✨ 请继续对话，共5步探索，完成后解锁说明书！';
+  
+  const phone = document.querySelector('.phone');
+  phone.appendChild(tip);
+  setTimeout(() => {
+    tip.style.animation = 'fo 0.25s ease forwards';
+    setTimeout(() => tip.remove(), 260);
+  }, 2200);
+}
+
+// Unlock report navigation item
+function unlockReportTab(){
+  const reportTab = document.getElementById('t-report');
+  reportTab.className = 'tab';
+  reportTab.style.opacity = '1';
+  reportTab.style.cursor = 'pointer';
+  reportTab.innerHTML = '📜 我的使用说明书';
+  reportTab.onclick = () => switchTab('report');
+}
+
+// ── Aesthetic Report Parser ──
+function parseAestheticContent(rawText) {
+  const summaryMatch = rawText.match(/【概括】([\s\S]*?)(?=【深度解析】|$)/);
+  const insightMatch = rawText.match(/【深度解析】([\s\S]*?)(?=【行动启示】|$)/);
+  const actionMatch  = rawText.match(/【行动启示】([\s\S]*?)$/);
+
+  const summary = summaryMatch ? summaryMatch[1].trim() : '';
+  const insight = insightMatch ? insightMatch[1].trim() : '';
+  const action  = actionMatch ? actionMatch[1].trim() : '';
+
+  if (!summary && !insight) {
+    // Fallback to normal text rendering if AI forgot the custom tags
+    return `<div class="r-txt-plain">${esc(rawText)}</div>`;
+  }
+
+  let html = '';
+  if (summary) {
+    html += `<div class="r-txt-summary">⚡ 诊断概括：${esc(summary)}</div>`;
+  }
+  if (insight) {
+    html += `<div class="r-txt-insight">🔮 启发式解读：${esc(insight)}</div>`;
+  }
+  if (action) {
+    html += `<div class="r-txt-action">💡 能量爆发点：${esc(action)}</div>`;
+  }
+  return html;
+}
+
+// ── Report Render (The High Aesthetic Poster Card with Web Scroll Protection) ──
+const DIMS = [
+  ['核心驱动','drive'],['发光条件','glow'],['使用须知','note'],['已知 Bug','bug']
+];
+
+function renderReport(rd, flash=false){
+  document.getElementById('r-badge').textContent    = rd.badge;
+  document.getElementById('r-line').textContent     = rd.tagline;
+  const el = document.getElementById('r-blocks');
+  el.innerHTML = '';
+  
+  DIMS.forEach(([label, key], i)=>{
+    const icon = DIM_ICONS[label] || '·';
+    const div  = document.createElement('div');
+    
+    // Add special CSS styles for bug warns
+    if(label === '已知 Bug') {
+      div.className = 'r-block warning-block' + (flash ? ' flash' : '');
+    } else {
+      div.className = 'r-block' + (flash ? ' flash' : '');
+    }
+    
+    div.style.animationDelay = flash ? '0ms' : (i*60)+'ms';
+    
+    let specialInject = '';
+    // If core drive, add a beautiful micro mechanical gauge line
+    if(label === '核心驱动') {
+      specialInject = '<div class="drive-gauge-container"><div class="drive-gauge"></div></div>';
+    }
+
+    div.innerHTML =
+      '<div class="r-block-head"><span class="r-icon">'+icon+'</span><span class="r-lbl">'+label+'</span></div>'+
+      '<div class="r-txt">' + parseAestheticContent(rd[key]) + '</div>' + specialInject;
+    el.appendChild(div);
+  });
+
+  // Highlight Major directions with the Gold Diagnosis Certificate
+  const majorDiv = document.createElement('div');
+  majorDiv.className = 'r-block major-recommendation' + (flash ? ' flash' : '');
+  majorDiv.style.animationDelay = flash ? '0ms' : '250ms';
+  majorDiv.innerHTML = `
+    <div class="r-block-head">
+      <span class="r-icon">🧭</span>
+      <span class="r-lbl">志愿诊断：现代专业与现实生存写照</span>
+    </div>
+    <div class="r-txt">${esc(rd.major)}</div>
+  `;
+  el.appendChild(majorDiv);
+}
+
+// ── Quick-reply chips ──
+function showChips(labels){
+  chipsEl.style.display = 'flex';
+  chipsEl.innerHTML = '';
+  labels.forEach(label=>{
+    const c = document.createElement('div');
+    c.className = 'chip';
+    c.textContent = label;
+    c.onclick = ()=>chipClick(label);
+    chipsEl.appendChild(c);
+  });
+}
+
+function chipClick(label){
+  chipsEl.style.display = 'none';
+  if(label === '重新来一遍'){
+    currentStep = 1;
+    history = [];
+    cardShown = false; reportDone = false; lastReport = null; pendingCardQ = ''; pendingOptions = [];
+    msgsEl.innerHTML = '';
+    document.getElementById('r-badge').textContent = '—';
+    document.getElementById('r-line').textContent  = '说明书生成后显示在这里';
+    document.getElementById('r-blocks').innerHTML  = '';
+    
+    // Relock navigation Tab
+    const reportTab = document.getElementById('t-report');
+    reportTab.className = 'tab locked';
+    reportTab.style.opacity = '0.45';
+    reportTab.style.cursor = 'not-allowed';
+    reportTab.innerHTML = '🔒 说明书 (探索中)';
+    reportTab.onclick = () => showLockedTip();
+
+    choicesBox.style.display = 'flex';
+    switchTab('chat');
+    
+    // Restart conversation with original options
+    setTimeout(() => bootChat(), 300);
+    return;
+  }
+  
+  if(label === '解释专业'){
+    inp.value = '能帮我详细解释一下说明书里推荐的现代重点专业和真实的就业环境吗？';
+  } else if (label === '我还有想补充的') {
+    inp.value = '我还有一些性格特征想补充：';
+  } else {
+    inp.value = label;
+  }
+  send();
+}
+
+// ── Tab switch ──
+function switchTab(t){
+  const isChat = t==='chat';
+  msgsEl.style.display          = isChat ? 'flex'  : 'none';
+  chipsEl.style.display         = (isChat && reportDone) ? 'flex' : 'none';
+  choicesBox.style.display      = (isChat && !reportDone) ? 'flex' : 'none';
+  document.getElementById('rp').style.display       = isChat ? 'none'  : 'flex';
+  document.getElementById('inp-row').style.display  = isChat ? 'flex'  : 'none';
+  document.getElementById('t-chat').className  = 'tab'+(isChat?' on':'');
+  document.getElementById('t-report').className = 'tab'+(!isChat?' on':'');
+  
+  if(!isChat){
+    document.getElementById('rp').scrollTop = 0;
+  }
+}
+
+// ── Boot ──
+function bootChat() {
+  setTimeout(()=>{
+    showTyping();
+    setTimeout(()=>{
+      removeTyping();
+      const open = '在聊专业前，我想先向你确认一件事——上一次你做一件事做到忘记时间、甚至连饭都忘了吃，具体是在做什么？';
+      addMsg('ai', esc(open));
+      history.push({role:'assistant', content:open});
+      renderChoices(INITIAL_OPTIONS);
+    }, 900);
+  }, 500);
+}
+
+window.addEventListener('load',()=>{ setTimeout(bootChat, 600); });
+</script>
+
+</body><div id="codex-browser-sidebar-comments-root" style="position: fixed; inset: 0px; pointer-events: none; z-index: 2147483647;"></div></html>
