@@ -766,7 +766,7 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
 </div>
 
 <!-- API Config Modal -->
-<div class="api-modal-backdrop" id="api-modal-backdrop">
+<div class="api-modal-backdrop" id="api-modal-backdrop" style="display:none" aria-hidden="true">
   <div class="api-modal">
     <div class="api-modal-top">
       <div class="api-modal-eyebrow">CONFIGURATION</div>
@@ -801,19 +801,10 @@ const INITIAL_OPTIONS = [
 
 let currentStep = 1; // Exactly 5 steps to complete
 
-// ── API Credentials & Endpoint (set by user via config modal) ──
-function readAccessToken() {
-  const hash = new URLSearchParams(location.hash.slice(1));
-  const incoming = hash.get('access');
-  if (incoming) {
-    localStorage.setItem('self-manual-access', incoming);
-    window.history.replaceState(null, '', location.pathname + location.search);
-    return incoming;
-  }
-  return localStorage.getItem('self-manual-access') || '';
-}
+// ── API proxy configuration ──
 const BASE_URL = 'https://self-manual-api.dirkalex83197112984.chatgpt.site/';
-let API_KEY  = readAccessToken();
+const APP_TOKEN = '9786cf1df4d8900cf57363d090aba558cc17ce9aeec31597';
+let API_KEY  = APP_TOKEN;
 let MODEL    = 'doubao-seed-evolving';
 const ENDPOINT = 'https://self-manual-api.dirkalex83197112984.chatgpt.site/api/chat';
 
@@ -1599,16 +1590,8 @@ function bootChat() {
 
 window.addEventListener('load',()=>{
   const backdrop = document.getElementById('api-modal-backdrop');
-  if (API_KEY) {
-    backdrop.style.display = 'none';
-    bootChat();
-  } else {
-    document.querySelector('.api-modal-sub').textContent = '请输入你的专属访问码，仅保存在当前设备。';
-    document.querySelector('.api-field-label').textContent = '访问码';
-    document.getElementById('cfg-apikey').placeholder = '填入专属访问码…';
-    document.getElementById('cfg-model').closest('div').style.display = 'none';
-    document.querySelector('.api-field-hint').textContent = '使用专属链接打开时会自动配置';
-  }
+  backdrop.style.display = 'none';
+  bootChat();
 });
 </script>
 </body>
