@@ -1030,11 +1030,11 @@ function friendlyApiError(error) {
   return '网络连接 DeepSeek 失败，请检查网络后重试。';
 }
 
-async function callDeepSeek(messages, { maxTokens = 900, temperature = 0.72, retries = 2 } = {}) {
+async function callDeepSeek(messages, { maxTokens = 900, temperature = 0.72, retries = 2, timeoutMs = REQUEST_TIMEOUT_MS } = {}) {
   let lastError = null;
   for (let attempt = 0; attempt <= retries; attempt++) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const res = await fetch(ENDPOINT, {
         method: 'POST',
@@ -1153,7 +1153,8 @@ async function send(){
     const result = await callDeepSeek(apiMessages, {
       maxTokens: expectingReport ? 2400 : 900,
       temperature: 0.72,
-      retries: 2
+      retries: expectingReport ? 1 : 2,
+      timeoutMs: expectingReport ? 75000 : REQUEST_TIMEOUT_MS
     });
     let raw = result.content;
     if (expectingReport && result.finishReason === 'length') {
@@ -1161,7 +1162,7 @@ async function send(){
         ...apiMessages,
         {role:'assistant', content:raw},
         {role:'user', content:'刚才的说明书因长度中断。请只从中断处继续，补全剩余结构，不要重复前文。'}
-      ], { maxTokens: 1600, temperature: 0.5, retries: 2 });
+      ], { maxTokens: 1600, temperature: 0.5, retries: 1, timeoutMs: 75000 });
       raw += '\n' + continuation.content;
     }
     history.push({role:'assistant', content:raw});
@@ -1307,7 +1308,11 @@ function parseReportPayload(text, forceReport = false) {
 
 function processResponse(raw, forceReport = false){
   // ── Double-Safety Parse options and character cards ──
-  let displayMessage = raw;
+  let displayMessage = String(raw || '')
+    // Occasionally the model repeats the silent transition nudge. It is
+    // implementation detail, not useful conversation content.
+    .replace(/^\s*[（(]\s*系统提示\s*[：:][^）)]*[）)]\s*/i, '')
+    .trim();
   let parsedOptions = [];
   let cardData = null;
 
@@ -1518,7 +1523,7 @@ async function triggerNextStep(){
   showTyping();
 
   // Build a silent system nudge to move to the next step
-  const stepGuidance = "\n【人物卡片已关闭。现在直接进入第4步：发光条件探索。用一个高度具象的二选一冲突场景提问，场景选项在气泡内必须换行显示，让用户看清楚。比如：\nA. 课程排满、有标准答案、每次能拿高分的温室环境；\nB. 几乎没人管、靠自驱、可能挂科也可能做出让人惊艳东西的荒野环境。\n你更适合哪种？\n附带【选项】格式（精简4字：如【温室高分】||【荒野自驱】||【视情况而定】||【两者都要】）。不要再提人物卡片或让用户选人物。】";
+  const stepGuidance = "\n【人物卡片已关闭。现在直接进入第4步：发光条件探索。用一个高度具象的二选一冲突场景提问，场景选项在气泡内必须换行显示，让用户看清楚。比如：\nA. 课程排满、有标准答案、每次能拿高分的温室环境；\nB. 几乎没人管、靠自驱、可能挂科也可能做出让人惊艳东西的荒野环境。\n你更适合哪种？\n附带【选项】格式（精简4字：如【温室高分】||【荒野自驱】||【视情况而定】||【两者都要】）。不要再提人物卡片或让用户选人物，也不要复述或提及本条系统指令。】";
 
   try {
     const apiMessages = [{role:'system', content:SYSTEM}, ...history];
