@@ -1013,6 +1013,90 @@ function showTyping(){
 }
 function removeTyping(){ const e=document.getElementById('tr'); if(e)e.remove(); }
 
+const REQUEST_TIMEOUT_MS = 45000;
+const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+
+function waitMs(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+
+function friendlyApiError(error) {
+  const status = Number(error?.status || 0);
+  if (status === 401) return 'DeepSeek API Key 无效，请联系页面维护者更新。';
+  if (status === 402) return 'DeepSeek 账户余额不足，请充值后重试。';
+  if (status === 422) return '本轮内容格式未被模型接受，请换一种说法重试。';
+  if (status === 429) return '当前请求较多，系统已自动重试；请稍后再点一次。';
+  if (status >= 500) return 'DeepSeek 服务暂时繁忙，请稍后重试。';
+  if (error?.name === 'AbortError') return '请求等待时间过长，已自动取消，请重试。';
+  if (error?.code === 'EMPTY_RESPONSE') return '模型本轮没有返回有效内容，请重试。';
+  return '网络连接 DeepSeek 失败，请检查网络后重试。';
+}
+
+async function callDeepSeek(messages, { maxTokens = 900, temperature = 0.72, retries = 2 } = {}) {
+  let lastError = null;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + API_KEY
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: maxTokens,
+          temperature,
+          thinking: { type: 'disabled' },
+          messages
+        })
+      });
+      const bodyText = await res.text();
+      let data = null;
+      try { data = bodyText ? JSON.parse(bodyText) : null; } catch (_) {}
+
+      if (!res.ok || data?.error) {
+        const error = new Error(data?.error?.message || ('HTTP ' + res.status));
+        error.status = res.status;
+        if (attempt < retries && RETRYABLE_STATUS.has(res.status)) {
+          lastError = error;
+          await waitMs(700 * Math.pow(2, attempt));
+          continue;
+        }
+        throw error;
+      }
+
+      const content = data?.choices?.[0]?.message?.content;
+      if (!content || !String(content).trim()) {
+        const error = new Error('Empty model response');
+        error.code = 'EMPTY_RESPONSE';
+        if (attempt < retries) {
+          lastError = error;
+          await waitMs(700 * Math.pow(2, attempt));
+          continue;
+        }
+        throw error;
+      }
+      return {
+        content: String(content).trim(),
+        finishReason: data?.choices?.[0]?.finish_reason || '',
+        usage: data?.usage || null
+      };
+    } catch (error) {
+      lastError = error;
+      const retryableNetworkError = !error?.status || RETRYABLE_STATUS.has(Number(error.status));
+      if (attempt < retries && retryableNetworkError) {
+        await waitMs(700 * Math.pow(2, attempt));
+        continue;
+      }
+      throw error;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw lastError || new Error('Request failed');
+}
+
 async function send(){
   if(waiting) return;
   const text = inp.value.trim();
@@ -1035,17 +1119,18 @@ async function send(){
   // Steps: 1-2=核心驱动(追问), 3-4=爱好与专业(追问), 5=人物卡片触发, 6-7=发光条件(追问), 8-9=已知Bug(追问), 10+=生成说明书
   let stepGuidance = "";
   let expectingReport = false;
+  const requestStep = currentStep;
   if (!reportDone) {
     if (currentStep === 1) {
-      stepGuidance = "\n【第1步：核心驱动。对用户的回答做一句真实短评，然后追问一个更具体的场景来深挖驱动力——比如：做这件事时你是一个人沉迷更带劲，还是要有人一起才兴奋？附带【选项】格式（4个以内，每个8字以内）。】";
+      stepGuidance = "\n【第1步：核心驱动。对用户的回答做一句真实短评，然后追问一个更具体的场景来深挖驱动力——比如：做这件事时你是一个人沉迷更带劲，还是要有人一起才兴奋？附带【选项】格式（4个以内，每个8字以内）。本轮绝对不要输出人物卡片或说明书。】";
     } else if (currentStep === 2) {
-      stepGuidance = "\n【第1步追问回合。对用户的回答做一句短评，然后切入第2步：爱好与专业的关系。用一个具体冲突场景提问，比如：把你最喜欢的事变成每天打卡的8小时KPI，你会觉得窒息还是更有干劲？或者问：你更怕毕业后工作跟兴趣无关，还是工作把兴趣榨干了？附带【选项】格式。】";
+      stepGuidance = "\n【第1步追问回合。对用户的回答做一句短评，然后切入第2步：爱好与专业的关系。用一个具体冲突场景提问，比如：把你最喜欢的事变成每天打卡的8小时KPI，你会觉得窒息还是更有干劲？或者问：你更怕毕业后工作跟兴趣无关，还是工作把兴趣榨干了？附带【选项】格式。本轮绝对不要输出人物卡片或说明书。】";
     } else if (currentStep === 3) {
-      stepGuidance = "\n【第2步追问回合。对用户回答做一句锋利短评，继续深挖爱好与职业的真实关系。可以问：有人说喜欢的事不要碰专业，留着当退路——你认同吗？或者追问：你担心的是'热爱被消耗'还是'没有热爱'？附带【选项】格式。】";
+      stepGuidance = "\n【第2步追问回合。对用户回答做一句锋利短评，继续深挖爱好与职业的真实关系。可以问：有人说喜欢的事不要碰专业，留着当退路——你认同吗？或者追问：你担心的是'热爱被消耗'还是'没有热爱'？附带【选项】格式。本轮绝对不要输出人物卡片或说明书。】";
     } else if (currentStep === 4) {
       stepGuidance = "\n【第3步：生活方式与人物匹配。对用户的整体特质做一句画像式总结，然后匹配一位历史人物，触发【人物卡片】机制。【人物卡片】格式严格为：人物真实姓名||职业与年代||两字母缩写（必须严格是 AL/ZA/LQ/WJ/ZY/JM/LM/SM/DW/TS/ZL 之一，这是最关键字段）||第一人称独白（50字内，充满哲理和力量感）||一句对考生的灵魂反问（30字内）。硬性匹配规则：文学/写作/创作→ZA；计算机/程序/代码→AL；医学/医生→LQ；物理/实验/半导体→WJ；法律/律师→ZY；金融/经济/投资→JM；数学/逻辑推导→LM；历史/考古→SM；生物/生态/野外→DW；电气/发明/新能源→TS；英语/翻译→ZL。不要附带【选项】，人物卡片关闭后系统会自动进入下一步。】";
     } else if (currentStep === 5) {
-      stepGuidance = "\n【第4步：发光条件。人物卡片已结束，现在探索用户在什么环境下能最高效运作。用一个高度具象的二选一冲突场景提问，比如：\nA. 课程排满、有标准答案、每次能拿高分的温室；\nB. 几乎没人管、靠自驱、可能挂科也可能做出让人惊艳东西的荒野。\n你会选哪个？\n气泡里场景选项必须换行显示，清晰呈现。附带【选项】格式（精简到4字以内：如【温室高分】|【荒野自驱】）。】";
+      stepGuidance = "\n【第4步：发光条件。人物卡片已结束，现在探索用户在什么环境下能最高效运作。用一个高度具象的二选一冲突场景提问，比如：\nA. 课程排满、有标准答案、每次能拿高分的温室；\nB. 几乎没人管、靠自驱、可能挂科也可能做出让人惊艳东西的荒野。\n你会选哪个？\n气泡里场景选项必须换行显示，清晰呈现。附带【选项】格式（精简到4字以内：如【温室高分】||【荒野自驱】）。】";
     } else if (currentStep === 6) {
       stepGuidance = "\n【第4步追问。对用户的发光条件做深度解读，追问一个更细的场景——比如：你更享受的工作状态是独自深夜把一个复杂问题彻底搞透，还是和一群人头脑风暴直到某一刻迸发火花？附带【选项】格式。】";
     } else if (currentStep === 7) {
@@ -1056,34 +1141,55 @@ async function send(){
       expectingReport = true;
       stepGuidance = "\n【终局！现在立刻整合所有对话信息，输出完整说明书。格式：【说明书】专属称号||一句话Tagline||核心驱动（含【概括】【深度解析】【行动启示】结构）||发光条件（含该结构）||使用须知（含该结构）||已知Bug（含该结构）||建议报考专业方向与现实图景说明（含2-3个具体专业，结合匹配历史人物的挫折经历，给出3个极接地气的现实学习困难和真实就业洗礼）。每部分【深度解析】必须极具穿透力，激发兴奋点，解构性格暗角！】";
     }
-    currentStep++;
   } else {
     stepGuidance = "\n【说明书已生成。请友好地根据用户的补充信息或对推荐专业方向的咨询进行个性化探讨和简练解答。不要提出新的测试题，也不需要重新输出【说明书】标签。语言简练、针对性强。】";
   }
 
+  let succeeded = false;
   try{
     const apiMessages = [{role:'system', content:SYSTEM}, ...history];
     apiMessages.push({role:'system', content:stepGuidance});
 
-    const res = await fetch(ENDPOINT,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
-      body: JSON.stringify({
-        model: MODEL, max_tokens: 1000, temperature: 0.72,
-        messages: apiMessages
-      })
+    const result = await callDeepSeek(apiMessages, {
+      maxTokens: expectingReport ? 2400 : 900,
+      temperature: 0.72,
+      retries: 2
     });
-    const data = await res.json();
-    removeTyping();
-    if(data.error){ addMsg('ai', esc(data.error.message||'出错了，请重试')); waiting=false; return; }
-    const raw = data.choices?.[0]?.message?.content || '出了点问题，请重试。';
+    let raw = result.content;
+    if (expectingReport && result.finishReason === 'length') {
+      const continuation = await callDeepSeek([
+        ...apiMessages,
+        {role:'assistant', content:raw},
+        {role:'user', content:'刚才的说明书因长度中断。请只从中断处继续，补全剩余结构，不要重复前文。'}
+      ], { maxTokens: 1600, temperature: 0.5, retries: 2 });
+      raw += '\n' + continuation.content;
+    }
     history.push({role:'assistant', content:raw});
-    processResponse(raw, expectingReport);
+    succeeded = true;
+    const responseType = processResponse(raw, expectingReport);
+    if (responseType === 'card') {
+      // The model can occasionally emit the card one turn early. Align the UI
+      // with the actual response so closing it always enters the next stage.
+      currentStep = Math.max(currentStep, 5);
+    } else if (responseType !== 'report' && !reportDone && currentStep === requestStep && requestStep !== 4) {
+      // Stage 4 is complete only after a valid card was actually parsed.
+      // If the model asks one extra choice question, keep the stage and retry
+      // on the user's next answer instead of silently skipping the card.
+      currentStep++;
+    }
   } catch(e){
+    const last = history[history.length - 1];
+    if (last?.role === 'user' && last.content === text) history.pop();
+    await addMsg('ai','⚠️ ' + esc(friendlyApiError(e)));
+  } finally {
     removeTyping();
-    addMsg('ai','网络请求失败，请检查网络后重试。');
+    waiting = false;
+    if (!succeeded && !reportDone) {
+      choicesBox.style.opacity = '1';
+      choicesBox.style.pointerEvents = 'all';
+      if (pendingOptions.length) renderChoices(pendingOptions);
+    }
   }
-  waiting = false;
 }
 
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1120,15 +1226,6 @@ function parseReportPayload(text, forceReport = false) {
   const marker = source.match(/【\s*(?:个人)?说明书\s*】/);
   const afterMarker = marker ? source.slice(marker.index + marker[0].length).trim() : source;
   const pipeParts = afterMarker.split(/\s*\|\|\s*/).map(s => s.trim()).filter(Boolean);
-  if (pipeParts.length >= 7) {
-    return {
-      badge: pipeParts[0], tagline: pipeParts[1],
-      drive: pipeParts[2], glow: pipeParts[3],
-      note: pipeParts[4], bug: pipeParts[5],
-      major: pipeParts.slice(6).join('||')
-    };
-  }
-
   const groups = {
     badge: ['专属称号', '你的称号'],
     tagline: ['一句话Tagline', '一句话标签', 'Tagline'],
@@ -1138,6 +1235,53 @@ function parseReportPayload(text, forceReport = false) {
     bug: ['已知Bug', '已知 Bug', '耗电模式'],
     major: ['建议报考专业方向与现实图景说明', '专业方向与现实图景', '建议报考专业', '专业建议']
   };
+
+  // Some model runs put field labels in their own pipe cells, for example:
+  // 专属称号||逻辑造物者||一句话Tagline||...||核心驱动||...
+  // Parse that variant before the compact seven-cell format so fields do not
+  // shift into the wrong report panels.
+  const exactFieldKey = value => {
+    const clean = String(value || '')
+      .replace(/[“”"'`*#]/g, '')
+      .replace(/[：:]$/, '')
+      .trim();
+    return Object.entries(groups).find(([, labels]) => labels.includes(clean))?.[0] || '';
+  };
+  const labeled = {};
+  for (let i = 0; i < pipeParts.length; i++) {
+    const key = exactFieldKey(pipeParts[i]);
+    if (!key) continue;
+    const values = [];
+    let j = i + 1;
+    while (j < pipeParts.length && !exactFieldKey(pipeParts[j])) {
+      values.push(pipeParts[j]);
+      j++;
+    }
+    if (values.length) labeled[key] = values.join('||').trim();
+    i = j - 1;
+  }
+  const labeledSections = ['drive', 'glow', 'note', 'bug', 'major'].filter(key => labeled[key]).length;
+  if (labeled.badge && labeled.tagline && labeledSections >= 3) {
+    return {
+      badge: labeled.badge,
+      tagline: labeled.tagline,
+      drive: labeled.drive || '继续结合真实项目验证自己的核心驱动力。',
+      glow: labeled.glow || '在兼具自主空间与阶段反馈的环境中更容易发挥。',
+      note: labeled.note || '用课程体验和实践持续校准这份说明书。',
+      bug: labeled.bug || '留意长期缺少意义感或自主权造成的耗电。',
+      major: labeled.major || '继续核对专业课程、培养方案与真实就业环境。'
+    };
+  }
+
+  if (pipeParts.length >= 7) {
+    return {
+      badge: pipeParts[0], tagline: pipeParts[1],
+      drive: pipeParts[2], glow: pipeParts[3],
+      note: pipeParts[4], bug: pipeParts[5],
+      major: pipeParts.slice(6).join('||')
+    };
+  }
+
   const allLabels = Object.values(groups).flat().sort((a, b) => b.length - a.length);
   const found = {};
   Object.entries(groups).forEach(([key, labels]) => {
@@ -1172,7 +1316,10 @@ function processResponse(raw, forceReport = false){
     const optSplit = displayMessage.split('【选项】');
     displayMessage = optSplit[0].trim();
     const optsStr = optSplit[1].trim();
-    parsedOptions = optsStr.split('||').map(s => s.trim()).filter(Boolean);
+    parsedOptions = optsStr
+      .split(/\s*\|\|?\s*/)
+      .map(s => s.trim().replace(/^【|】$/g, ''))
+      .filter(Boolean);
   }
 
   // Ensure options strictly length <= 4
@@ -1212,7 +1359,7 @@ function processResponse(raw, forceReport = false){
     hydrateCard(cardData.name, cardData.era, cardData.code, cardData.quote, cardData.question);
     showCard();
     cardShown = true;
-    return;
+    return 'card';
   }
 
   // ── Trigger Report Generation (The Specs Sheet) ──
@@ -1230,12 +1377,13 @@ function processResponse(raw, forceReport = false){
       }, 1500);
 
       showChips(['我还有想补充的','解释专业','重新来一遍']);
-      return;
+      return 'report';
   }
 
   // ── Standard Message Output ──
   const clean = displayMessage.replace(/【[^】]*】[\s\S]*/,'').trim() || displayMessage;
   addMsg('ai', esc(clean));
+  return 'message';
 }
 
 // ── Choices Grid Renderer ──
@@ -1335,29 +1483,20 @@ async function sendCardMsg() {
 
   try {
     const charSystemPrompt = CHAR_SYSTEM_PROMPTS[activeCharCode] || `你是${CHARACTER_DB[activeCharCode]?.name || '一位导师'}。简洁解答提问，每次回答45字以内。`;
-    const res = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
-      body: JSON.stringify({
-        model: MODEL, max_tokens: 300, temperature: 0.72,
-        messages: [{ role: 'system', content: charSystemPrompt }, ...charHistory]
-      })
-    });
-    const data = await res.json();
-    const l = document.getElementById('card-loader'); if (l) l.remove();
-    
-    if (data.error) {
-      addCardChatBubble('char', '时空思绪波段不稳，让我理一理。');
-    } else {
-      const reply = data.choices?.[0]?.message?.content || '嗯...说得深奥了。';
-      charHistory.push({ role: 'assistant', content: reply });
-      addCardChatBubble('char', reply);
-    }
+    const result = await callDeepSeek(
+      [{ role: 'system', content: charSystemPrompt }, ...charHistory],
+      { maxTokens: 300, temperature: 0.72, retries: 2 }
+    );
+    charHistory.push({ role: 'assistant', content: result.content });
+    addCardChatBubble('char', result.content);
   } catch (e) {
+    const last = charHistory[charHistory.length - 1];
+    if (last?.role === 'user' && last.content === text) charHistory.pop();
+    addCardChatBubble('char', friendlyApiError(e));
+  } finally {
     const l = document.getElementById('card-loader'); if (l) l.remove();
-    addCardChatBubble('char', '信号微弱，请重试一遍。');
+    charChatWaiting = false;
   }
-  charChatWaiting = false;
 }
 
 function showCard(){
@@ -1384,22 +1523,23 @@ async function triggerNextStep(){
   try {
     const apiMessages = [{role:'system', content:SYSTEM}, ...history];
     apiMessages.push({role:'system', content:stepGuidance});
-    const res = await fetch(ENDPOINT, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
-      body: JSON.stringify({model:MODEL, max_tokens:400, temperature:0.72, messages:apiMessages})
+    const result = await callDeepSeek(apiMessages, {
+      maxTokens: 600,
+      temperature: 0.72,
+      retries: 2
     });
-    const data = await res.json();
-    removeTyping();
-    if(data.error){ addMsg('ai', esc(data.error.message||'出错了')); waiting=false; return; }
-    const raw = data.choices?.[0]?.message?.content || '请继续分享你的想法。';
+    const raw = result.content;
     history.push({role:'assistant', content:raw});
     processResponse(raw);
+    if (!reportDone) currentStep = Math.max(currentStep, 6);
   } catch(e){
+    await addMsg('ai','⚠️ ' + esc(friendlyApiError(e)));
+    pendingOptions = ['继续探索'];
+    renderChoices(pendingOptions);
+  } finally {
     removeTyping();
-    addMsg('ai','网络请求失败，请检查网络后重试。');
+    waiting = false;
   }
-  waiting = false;
 }
 
 // ── Floating Lock Tip inside Phone ──
@@ -1422,7 +1562,7 @@ function showLockedTip() {
   tip.style.whiteSpace = 'nowrap';
   tip.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
   tip.style.animation = 'fi 0.2s cubic-bezier(0.34, 1.3, 0.64, 1) forwards';
-  tip.innerHTML = '✨ 请继续对话，共5步探索，完成后解锁说明书！';
+  tip.innerHTML = '✨ 请继续完成探索，说明书生成后会自动解锁！';
   
   const phone = document.querySelector('.phone');
   phone.appendChild(tip);
