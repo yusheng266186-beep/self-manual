@@ -62,7 +62,7 @@
 
 ### 在线使用
 
-直接打开 Pages 地址即可开始探索。项目不会在公开仓库中保存火山引擎 Ark API Key。
+直接打开 Pages 地址即可开始探索。页面通过 DeepSeek 官方 API 生成对话。
 
 AI 对话依赖网络连接；断网时静态页面仍可能显示，但模型回答无法生成。
 
@@ -80,36 +80,33 @@ AI 对话依赖网络连接；断网时静态页面仍可能显示，但模型�
 
 ## 模型与安全架构
 
-项目使用火山引擎方舟 Coding Plan 的兼容 Chat Completions 接口，当前固定模型为：
+项目使用 DeepSeek 官方兼容 Chat Completions 接口，当前固定模型为：
 
-    doubao-seed-evolving
+    deepseek-v4-flash
 
 请求链路如下：
 
     Android / 浏览器
             ↓
     GitHub Pages 静态前端
-            ↓  X-App-Token
-    服务端代理
-            ↓  服务端保存的 Ark API Key
-    火山引擎方舟 Coding Plan
+            ↓  HTTPS + Bearer API Key
+    DeepSeek 官方 API
 
-安全设计：
+当前部署方式：
 
-- Ark API Key 只保存在服务端环境变量中；
-- GitHub 仓库和 index.html 不包含 Ark API Key；
-- 前端只携带代理调用凭证，不会接触 Ark API Key；
-- 服务端固定模型、限制请求体积和输出长度；
-- 服务端校验请求来源和代理调用凭证；
-- 如果公开页面遭到滥用，应更换代理调用凭证或增加更严格的访问控制。
+- 浏览器直接请求 DeepSeek 官方接口，不经过第三方代理；
+- 国内网络不再依赖 chatgpt.site 服务；
+- 为实现打开即用，DeepSeek API Key 按项目所有者要求内嵌在 index.html；
+- 这是公开仓库，任何人都可能从源码中提取 Key 并消耗余额；
+- 建议在 DeepSeek 控制台设置余额、调用量或告警，并定期检查用量；
+- 如果页面被公开传播或出现异常用量，应立即更换 Key，并改为服务端代理。
 
 ## 技术实现
 
 - 原生 HTML、CSS 和 JavaScript；
 - 单文件响应式页面；
-- Fetch API 调用服务端代理；
+- Fetch API 直接调用 DeepSeek 官方 API；
 - GitHub Pages 托管前端；
-- 服务端代理转发至火山引擎方舟 Coding Plan；
 - 不依赖 npm 构建流程和前端框架。
 
 ## 目录结构
@@ -124,7 +121,7 @@ AI 对话依赖网络连接；断网时静态页面仍可能显示，但模型�
 修改页面后建议依次检查：
 
 1. index.html 的 JavaScript 语法；
-2. 页面源码中没有 Ark API Key、Authorization 头或火山引擎直连接口；
+2. DeepSeek 接口地址和模型名称正确；
 3. 普通 Pages 地址打开后能直接进入对话；
 4. 主探索与人物卡片对话都能获得模型响应；
 5. 生成说明书后标签页、继续追问和重新探索正常；
