@@ -765,31 +765,6 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
   </div>
 </div>
 
-<!-- API Config Modal -->
-<div class="api-modal-backdrop" id="api-modal-backdrop" style="display:none" aria-hidden="true">
-  <div class="api-modal">
-    <div class="api-modal-top">
-      <div class="api-modal-eyebrow">CONFIGURATION</div>
-      <div class="api-modal-title">自我使用说明书</div>
-      <div class="api-modal-sub">请填写豆包 API 配置，仅在本地使用，不会上传或存储。</div>
-    </div>
-    <div class="api-modal-body">
-      <div>
-        <div class="api-field-label">API Key</div>
-        <input class="api-field-input" id="cfg-apikey" type="password" placeholder="填入你的 Ark API Key…" autocomplete="off">
-        <div class="api-field-hint">火山方舟控制台 → API Key 管理</div>
-      </div>
-      <div>
-        <div class="api-field-label">Model ID</div>
-        <input class="api-field-input" id="cfg-model" type="text" placeholder="例如 doubao-1-5-pro-32k-250115" autocomplete="off">
-        <div class="api-field-hint">填写兼容 Chat Completions 的模型 ID，推荐 doubao-1-5-pro-32k-250115 或 doubao-1-5-lite-32k-250115。<br>⚠️ doubao-seed 系列不兼容，请勿填写。</div>
-      </div>
-      <div class="api-error-tip" id="cfg-error">请填写 API Key 和 Model ID</div>
-      <button class="api-confirm-btn" id="cfg-confirm-btn" onclick="confirmConfig()">开始探索 →</button>
-    </div>
-  </div>
-</div>
-
 <script>
 // ── 1. Priority Declaration & Configuration Global Constants ──
 const INITIAL_OPTIONS = [
@@ -801,41 +776,11 @@ const INITIAL_OPTIONS = [
 
 let currentStep = 1; // Exactly 5 steps to complete
 
-// ── API proxy configuration ──
-const BASE_URL = 'https://self-manual-api.dirkalex83197112984.chatgpt.site/';
-const APP_TOKEN = '9786cf1df4d8900cf57363d090aba558cc17ce9aeec31597';
-try { localStorage.removeItem('self-manual-access'); } catch (_) {}
-let API_KEY  = APP_TOKEN;
-let MODEL    = 'doubao-seed-evolving';
-const ENDPOINT = 'https://self-manual-api.dirkalex83197112984.chatgpt.site/api/chat';
-
-function confirmConfig() {
-  const keyInput = document.getElementById('cfg-apikey');
-  const errEl = document.getElementById('cfg-error');
-  const btn = document.getElementById('cfg-confirm-btn');
-  const key = keyInput.value.trim();
-
-  if (!key) {
-    errEl.style.display = 'block';
-    errEl.textContent = '请输入专属访问码。';
-    return;
-  }
-
-  API_KEY = key;
-  MODEL = 'doubao-seed-evolving';
-  localStorage.setItem('self-manual-access', key);
-  errEl.style.display = 'none';
-  btn.disabled = true;
-  btn.textContent = '配置中…';
-
-  const backdrop = document.getElementById('api-modal-backdrop');
-  backdrop.style.opacity = '0';
-  backdrop.style.transition = 'opacity 0.25s ease';
-  setTimeout(() => {
-    backdrop.style.display = 'none';
-    bootChat();
-  }, 260);
-}
+// ── DeepSeek official API configuration ──
+const BASE_URL = 'https://api.deepseek.com/';
+let API_KEY  = 'sk-6997b7900ca54fdba76fd094e8cd17a8';
+let MODEL    = 'deepseek-v4-flash';
+const ENDPOINT = BASE_URL + 'chat/completions';
 
 // ── Historical Character Dataset mapped strictly to Image_fc3863 with realistic major pain points ──
 const CHARACTER_DB = {
@@ -1122,7 +1067,7 @@ async function send(){
 
     const res = await fetch(ENDPOINT,{
       method:'POST',
-      headers:{'Content-Type':'application/json','X-App-Token':API_KEY},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
       body: JSON.stringify({
         model: MODEL, max_tokens: 1000, temperature: 0.72,
         messages: apiMessages
@@ -1392,7 +1337,7 @@ async function sendCardMsg() {
     const charSystemPrompt = CHAR_SYSTEM_PROMPTS[activeCharCode] || `你是${CHARACTER_DB[activeCharCode]?.name || '一位导师'}。简洁解答提问，每次回答45字以内。`;
     const res = await fetch(ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-App-Token': API_KEY },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
       body: JSON.stringify({
         model: MODEL, max_tokens: 300, temperature: 0.72,
         messages: [{ role: 'system', content: charSystemPrompt }, ...charHistory]
@@ -1441,7 +1386,7 @@ async function triggerNextStep(){
     apiMessages.push({role:'system', content:stepGuidance});
     const res = await fetch(ENDPOINT, {
       method:'POST',
-      headers:{'Content-Type':'application/json','X-App-Token':API_KEY},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
       body: JSON.stringify({model:MODEL, max_tokens:400, temperature:0.72, messages:apiMessages})
     });
     const data = await res.json();
@@ -1656,8 +1601,6 @@ function bootChat() {
 }
 
 window.addEventListener('load',()=>{
-  const backdrop = document.getElementById('api-modal-backdrop');
-  backdrop.style.display = 'none';
   bootChat();
 });
 </script>
