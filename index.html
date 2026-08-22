@@ -1,5 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="zh"><head>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>自我使用说明书 - 高考志愿版</title>
@@ -516,6 +517,112 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
 @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fo{from{opacity:1;transform:translateY(0) translateX(-50%)}to{opacity:0;transform:translateY(8px) translateX(-50%)}}
 
+/* ── API Config Modal ── */
+.api-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(32,28,24,0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+.api-modal {
+  background: #faf7f2;
+  border-radius: 20px;
+  border: 1px solid #2e2b27;
+  width: 320px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(32,28,24,0.3);
+  animation: fi 0.32s cubic-bezier(0.34,1.3,0.64,1) forwards;
+}
+.api-modal-top {
+  background: #2e2b27;
+  padding: 18px 20px 14px;
+}
+.api-modal-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: #8a8278;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.api-modal-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f7f4ee;
+  letter-spacing: 0.04em;
+}
+.api-modal-sub {
+  font-size: 10.5px;
+  color: #a09890;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.api-modal-body {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.api-field-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #8a8278;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.api-field-input {
+  width: 100%;
+  background: #ece6da;
+  border: 1px solid #dcd7cd;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-family: 'Noto Sans SC', sans-serif;
+  color: #2e2b27;
+  outline: none;
+  transition: border-color 0.18s;
+}
+.api-field-input:focus {
+  border-color: #8f3d2c;
+}
+.api-field-input::placeholder {
+  color: #b8b0a6;
+}
+.api-field-hint {
+  font-size: 9.5px;
+  color: #a09890;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.api-confirm-btn {
+  width: 100%;
+  background: #2e2b27;
+  color: #f7f4ee;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 13px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: opacity 0.18s;
+}
+.api-confirm-btn:hover { opacity: 0.82; }
+.api-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.api-error-tip {
+  font-size: 10.5px;
+  color: #8f3d2c;
+  text-align: center;
+  display: none;
+  margin-top: -6px;
+}
 </style>
 </head>
 <body>
@@ -593,7 +700,7 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
     <div class="inp-row" id="inp-row">
       <textarea id="inp" placeholder="在此输入你的真实想法…" onkeydown="onKey(event)" oninput="autoH(this)"></textarea>
       <button class="send-btn" onclick="send()">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
   </div>
@@ -628,7 +735,7 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
           <div class="card-chat-input-row">
             <input type="text" class="card-chat-input" id="card-chat-input" placeholder="跨时空提问TA..." onkeydown="onCardKey(event)">
             <button class="card-chat-send" onclick="sendCardMsg()">
-              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
           </div>
         </div>
@@ -658,7 +765,30 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
   </div>
 </div>
 
-
+<!-- API Config Modal -->
+<div class="api-modal-backdrop" id="api-modal-backdrop">
+  <div class="api-modal">
+    <div class="api-modal-top">
+      <div class="api-modal-eyebrow">CONFIGURATION</div>
+      <div class="api-modal-title">自我使用说明书</div>
+      <div class="api-modal-sub">请填写豆包 API 配置，仅在本地使用，不会上传或存储。</div>
+    </div>
+    <div class="api-modal-body">
+      <div>
+        <div class="api-field-label">API Key</div>
+        <input class="api-field-input" id="cfg-apikey" type="password" placeholder="填入你的 Ark API Key…" autocomplete="off">
+        <div class="api-field-hint">火山方舟控制台 → API Key 管理</div>
+      </div>
+      <div>
+        <div class="api-field-label">Model ID</div>
+        <input class="api-field-input" id="cfg-model" type="text" placeholder="例如 doubao-1-5-pro-32k-250115" autocomplete="off">
+        <div class="api-field-hint">填写兼容 Chat Completions 的模型 ID，推荐 doubao-1-5-pro-32k-250115 或 doubao-1-5-lite-32k-250115。<br>⚠️ doubao-seed 系列不兼容，请勿填写。</div>
+      </div>
+      <div class="api-error-tip" id="cfg-error">请填写 API Key 和 Model ID</div>
+      <button class="api-confirm-btn" id="cfg-confirm-btn" onclick="confirmConfig()">开始探索 →</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ── 1. Priority Declaration & Configuration Global Constants ──
@@ -672,10 +802,48 @@ const INITIAL_OPTIONS = [
 let currentStep = 1; // Exactly 5 steps to complete
 
 // ── API Credentials & Endpoint (set by user via config modal) ──
-const BASE_URL = 'https://api.deepseek.com/';
-const API_KEY = 'sk-c77db7602fea4a87879ec24f4b6fd5b3';
-const MODEL   = 'deepseek-v4-pro';
-const ENDPOINT = BASE_URL + 'chat/completions';
+function readAccessToken() {
+  const hash = new URLSearchParams(location.hash.slice(1));
+  const incoming = hash.get('access');
+  if (incoming) {
+    localStorage.setItem('self-manual-access', incoming);
+    history.replaceState(null, '', location.pathname + location.search);
+    return incoming;
+  }
+  return localStorage.getItem('self-manual-access') || '';
+}
+const BASE_URL = 'https://self-manual-api.dirkalex83197112984.chatgpt.site/';
+let API_KEY  = readAccessToken();
+let MODEL    = 'doubao-seed-evolving';
+const ENDPOINT = 'https://self-manual-api.dirkalex83197112984.chatgpt.site/api/chat';
+
+function confirmConfig() {
+  const keyInput = document.getElementById('cfg-apikey');
+  const errEl = document.getElementById('cfg-error');
+  const btn = document.getElementById('cfg-confirm-btn');
+  const key = keyInput.value.trim();
+
+  if (!key) {
+    errEl.style.display = 'block';
+    errEl.textContent = '请输入专属访问码。';
+    return;
+  }
+
+  API_KEY = key;
+  MODEL = 'doubao-seed-evolving';
+  localStorage.setItem('self-manual-access', key);
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = '配置中…';
+
+  const backdrop = document.getElementById('api-modal-backdrop');
+  backdrop.style.opacity = '0';
+  backdrop.style.transition = 'opacity 0.25s ease';
+  setTimeout(() => {
+    backdrop.style.display = 'none';
+    bootChat();
+  }, 260);
+}
 
 // ── Historical Character Dataset mapped strictly to Image_fc3863 with realistic major pain points ──
 const CHARACTER_DB = {
@@ -947,8 +1115,7 @@ async function send(){
     } else if (currentStep === 8) {
       stepGuidance = "\n【第5步追问。对用户的Bug信号做一句穿透性的解读，继续追问：你最讨厌的一种人或状态是什么？这往往暴露你最深的性格暗角。附带【选项】格式。】";
     } else if (currentStep >= 9) {
-      stepGuidance = "\n【终局】现在严格按以下单一格式输出，不要对话不要解释，直接输出：\n【说明书】专属称号||一句话Tagline||核心驱动【概括】概括内容【深度解析】深度解析内容【行动启示】行动启示内容||发光条件【概括】概括内容【深度解析】深度解析内容【行动启示】行动启示内容||使用须知【概括】概括内容【深度解析】深度解析内容【行动启示】行动启示内容||已知Bug【概括】概括内容【深度解析】深度解析内容【行动启示】行动启示内容||专业方向：2-3个具体专业||结合匹配人物的挫折经历给出3个现实学习困难和就业洗礼\n【说明书】必须出现在开头第一行！用||分隔7个字段！【概括】【深度解析】【行动启示】用中文全角括号！";
-
+      stepGuidance = "\n【终局！现在立刻整合所有对话信息，输出完整说明书。格式：【说明书】专属称号||一句话Tagline||核心驱动（含【概括】【深度解析】【行动启示】结构）||发光条件（含该结构）||使用须知（含该结构）||已知Bug（含该结构）||建议报考专业方向与现实图景说明（含2-3个具体专业，结合匹配历史人物的挫折经历，给出3个极接地气的现实学习困难和真实就业洗礼）。每部分【深度解析】必须极具穿透力，激发兴奋点，解构性格暗角！】";
     }
     currentStep++;
   } else {
@@ -961,9 +1128,9 @@ async function send(){
 
     const res = await fetch(ENDPOINT,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
+      headers:{'Content-Type':'application/json','X-App-Token':API_KEY},
       body: JSON.stringify({
-        model: MODEL, max_tokens: 4096, temperature: 0.72, thinking: {"type":"disabled"},
+        model: MODEL, max_tokens: 1000, temperature: 0.72,
         messages: apiMessages
       })
     });
@@ -1025,23 +1192,7 @@ function processResponse(raw){
     choicesBox.style.display = 'none';
   }
 
-  
-  // ── Detect exploration completion (fallback for DeepSeek) ──
-  if(!cardData && !reportDone && 
-     (displayMessage.includes('五个维度已全部挖完') || 
-      displayMessage.includes('五个维度已挖完') ||
-      displayMessage.includes('专属自我使用说明书'))) {
-    // The AI is saying it's done but might not output correct format
-    // Instead of showing this response, trigger a follow-up to get proper format
-    if(displayMessage.includes('【说明书】')) {
-      // It has proper format, let processResponse handle it normally
-    } else {
-      // Remove the current response from display and trigger format generation
-      triggerFinalReport();
-      return;
-    }
-  }
-// ── Trigger Character Card Display ──
+  // ── Trigger Character Card Display ──
   if(cardData && !cardShown){
     if(displayMessage) addMsg('ai', esc(displayMessage));
     pendingCardQ = cardData.question;
@@ -1183,9 +1334,9 @@ async function sendCardMsg() {
     const charSystemPrompt = CHAR_SYSTEM_PROMPTS[activeCharCode] || `你是${CHARACTER_DB[activeCharCode]?.name || '一位导师'}。简洁解答提问，每次回答45字以内。`;
     const res = await fetch(ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
+      headers: { 'Content-Type': 'application/json', 'X-App-Token': API_KEY },
       body: JSON.stringify({
-        model: MODEL, max_tokens: 1024, temperature: 0.72, thinking: {"type":"disabled"},
+        model: MODEL, max_tokens: 300, temperature: 0.72,
         messages: [{ role: 'system', content: charSystemPrompt }, ...charHistory]
       })
     });
@@ -1232,8 +1383,8 @@ async function triggerNextStep(){
     apiMessages.push({role:'system', content:stepGuidance});
     const res = await fetch(ENDPOINT, {
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
-      body: JSON.stringify({model:MODEL, max_tokens:2048, temperature:0.72, thinking:{"type":"disabled"}, messages:apiMessages})
+      headers:{'Content-Type':'application/json','X-App-Token':API_KEY},
+      body: JSON.stringify({model:MODEL, max_tokens:400, temperature:0.72, messages:apiMessages})
     });
     const data = await res.json();
     removeTyping();
@@ -1248,42 +1399,6 @@ async function triggerNextStep(){
   waiting = false;
 }
 
-
-// ── Fallback: trigger final report generation when AI doesn't output correct format ──
-let reportRetryCount = 0;
-async function triggerFinalReport() {
-  if(waiting || reportRetryCount > 2) return;
-  reportRetryCount++;
-  waiting = true;
-  showTyping();
-  
-  try {
-    const finalPrompt = "现在立刻输出完整【自我使用说明书】。只输出以下格式，不要对话不要解释不要任何其他文字：\n【说明书】专属称号||一句话Tagline||核心驱动【概括】概括【深度解析】深度解析【行动启示】行动启示||发光条件【概括】概括【深度解析】深度解析【行动启示】行动启示||使用须知【概括】概括【深度解析】深度解析【行动启示】行动启示||已知Bug【概括】概括【深度解析】深度解析【行动启示】行动启示||2-3个具体专业方向||现实图景说明及心理洗礼\n\n必须使用【说明书】开头！用||分隔！不要在前面加任何对话！";
-    
-    apiMessages.push({role:'system', content: finalPrompt});
-    const apiMessages = [{role:'system', content: finalPrompt}];
-    const res = await fetch(ENDPOINT, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
-      body: JSON.stringify({model:MODEL, max_tokens:4096, temperature:0.4, thinking:{"type":"disabled"}, messages:apiMessages})
-    });
-    const data = await res.json();
-    removeTyping();
-    if(data.error){ addMsg('ai', esc(data.error.message||'出错了')); waiting=false; return; }
-    const raw = data.choices?.[0]?.message?.content || '';
-    if(raw.includes('【说明书】')) {
-      history.push({role:'assistant', content:raw});
-      processResponse(raw);
-    } else {
-      addMsg('ai', '✨ 探索已完成！你的专属自我使用说明书已准备就绪。');
-      waiting = false;
-    }
-  } catch(e) {
-    removeTyping();
-    addMsg('ai','✨ 探索已完成！请继续对话以生成说明书。');
-  }
-  waiting = false;
-}
 // ── Floating Lock Tip inside Phone ──
 function showLockedTip() {
   const existing = document.getElementById('lock-tip');
@@ -1482,7 +1597,19 @@ function bootChat() {
   }, 500);
 }
 
-window.addEventListener('load',()=>{ setTimeout(bootChat, 600); });
+window.addEventListener('load',()=>{
+  const backdrop = document.getElementById('api-modal-backdrop');
+  if (API_KEY) {
+    backdrop.style.display = 'none';
+    bootChat();
+  } else {
+    document.querySelector('.api-modal-sub').textContent = '请输入你的专属访问码，仅保存在当前设备。';
+    document.querySelector('.api-field-label').textContent = '访问码';
+    document.getElementById('cfg-apikey').placeholder = '填入专属访问码…';
+    document.getElementById('cfg-model').closest('div').style.display = 'none';
+    document.querySelector('.api-field-hint').textContent = '使用专属链接打开时会自动配置';
+  }
+});
 </script>
-
-</body><div id="codex-browser-sidebar-comments-root" style="position: fixed; inset: 0px; pointer-events: none; z-index: 2147483647;"></div></html>
+</body>
+</html>
