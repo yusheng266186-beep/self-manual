@@ -1089,6 +1089,7 @@ async function send(){
   // Dialog stage turn limiter configuration
   // Steps: 1-2=核心驱动(追问), 3-4=爱好与专业(追问), 5=人物卡片触发, 6-7=发光条件(追问), 8-9=已知Bug(追问), 10+=生成说明书
   let stepGuidance = "";
+  let expectingReport = false;
   if (!reportDone) {
     if (currentStep === 1) {
       stepGuidance = "\n【第1步：核心驱动。对用户的回答做一句真实短评，然后追问一个更具体的场景来深挖驱动力——比如：做这件事时你是一个人沉迷更带劲，还是要有人一起才兴奋？附带【选项】格式（4个以内，每个8字以内）。】";
@@ -1107,6 +1108,7 @@ async function send(){
     } else if (currentStep === 8) {
       stepGuidance = "\n【第5步追问。对用户的Bug信号做一句穿透性的解读，继续追问：你最讨厌的一种人或状态是什么？这往往暴露你最深的性格暗角。附带【选项】格式。】";
     } else if (currentStep >= 9) {
+      expectingReport = true;
       stepGuidance = "\n【终局！现在立刻整合所有对话信息，输出完整说明书。格式：【说明书】专属称号||一句话Tagline||核心驱动（含【概括】【深度解析】【行动启示】结构）||发光条件（含该结构）||使用须知（含该结构）||已知Bug（含该结构）||建议报考专业方向与现实图景说明（含2-3个具体专业，结合匹配历史人物的挫折经历，给出3个极接地气的现实学习困难和真实就业洗礼）。每部分【深度解析】必须极具穿透力，激发兴奋点，解构性格暗角！】";
     }
     currentStep++;
@@ -1131,7 +1133,7 @@ async function send(){
     if(data.error){ addMsg('ai', esc(data.error.message||'出错了，请重试')); waiting=false; return; }
     const raw = data.choices?.[0]?.message?.content || '出了点问题，请重试。';
     history.push({role:'assistant', content:raw});
-    processResponse(raw);
+    processResponse(raw, expectingReport);
   } catch(e){
     removeTyping();
     addMsg('ai','网络请求失败，请检查网络后重试。');
@@ -1141,7 +1143,80 @@ async function send(){
 
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-function processResponse(raw){
+function stripReportHeading(text) {
+  return String(text || '')
+    .replace(/^\s*[#>*\-\d.、]+\s*/, '')
+    .replace(/^\s*【?[^】:\n]{1,24}】?\s*[：:]?\s*/, '')
+    .trim();
+}
+
+function extractReportSection(text, labels, allLabels) {
+  const source = String(text || '');
+  let hit = null;
+  labels.forEach(label => {
+    const index = source.indexOf(label);
+    if (index >= 0 && (!hit || index < hit.index)) hit = { index, label };
+  });
+  if (!hit) return '';
+  let start = hit.index + hit.label.length;
+  let end = source.length;
+  allLabels.forEach(label => {
+    const index = source.indexOf(label, start);
+    if (index >= 0 && index < end) end = index;
+  });
+  return source.slice(start, end)
+    .replace(/^\s*[】）)\]*#：:\-—|]+\s*/, '')
+    .replace(/\s*[#>*\-]+\s*$/, '')
+    .trim();
+}
+
+function parseReportPayload(text, forceReport = false) {
+  const source = String(text || '').trim();
+  const marker = source.match(/【\s*(?:个人)?说明书\s*】/);
+  const afterMarker = marker ? source.slice(marker.index + marker[0].length).trim() : source;
+  const pipeParts = afterMarker.split(/\s*\|\|\s*/).map(s => s.trim()).filter(Boolean);
+  if (pipeParts.length >= 7) {
+    return {
+      badge: pipeParts[0], tagline: pipeParts[1],
+      drive: pipeParts[2], glow: pipeParts[3],
+      note: pipeParts[4], bug: pipeParts[5],
+      major: pipeParts.slice(6).join('||')
+    };
+  }
+
+  const groups = {
+    badge: ['专属称号', '你的称号'],
+    tagline: ['一句话Tagline', '一句话标签', 'Tagline'],
+    drive: ['核心驱动'],
+    glow: ['发光条件'],
+    note: ['使用须知'],
+    bug: ['已知Bug', '已知 Bug', '耗电模式'],
+    major: ['建议报考专业方向与现实图景说明', '专业方向与现实图景', '建议报考专业', '专业建议']
+  };
+  const allLabels = Object.values(groups).flat().sort((a, b) => b.length - a.length);
+  const found = {};
+  Object.entries(groups).forEach(([key, labels]) => {
+    found[key] = extractReportSection(afterMarker, labels, allLabels);
+  });
+  const sectionCount = ['drive', 'glow', 'note', 'bug', 'major'].filter(key => found[key]).length;
+  const looksLikeReport = Boolean(marker) || sectionCount >= 3 || (source.includes('说明书') && sectionCount >= 2);
+  if (!forceReport && !looksLikeReport) return null;
+
+  const firstUsefulLine = source.split(/\n+/)
+    .map(stripReportHeading)
+    .find(line => line && !/^(自我使用说明书|说明书)$/.test(line)) || '一份忠于真实自我的使用说明';
+  return {
+    badge: found.badge || '你的专属说明书',
+    tagline: found.tagline || firstUsefulLine.slice(0, 72),
+    drive: found.drive || afterMarker,
+    glow: found.glow || '最适合在拥有自主空间、明确目标并能持续获得反馈的环境中发挥。',
+    note: found.note || '把这份说明书当作方向提示，并用真实课程体验和实践继续校准。',
+    bug: found.bug || '当环境长期缺少意义感或自主权时，容易快速耗电。',
+    major: found.major || '请结合说明书正文中的专业建议，继续核对课程、院校培养方案和真实就业环境。'
+  };
+}
+
+function processResponse(raw, forceReport = false){
   // ── Double-Safety Parse options and character cards ──
   let displayMessage = raw;
   let parsedOptions = [];
@@ -1196,16 +1271,8 @@ function processResponse(raw){
   }
 
   // ── Trigger Report Generation (The Specs Sheet) ──
-  if(displayMessage.includes('【说明书】')){
-    const after = displayMessage.split('【说明书】')[1];
-    const parts = after.split('||');
-    if(parts.length >= 7){
-      const rd = {
-        badge:parts[0].trim(), tagline:parts[1].trim(),
-        drive:parts[2].trim(), glow:parts[3].trim(),
-        note:parts[4].trim(), bug:parts[5].trim(), 
-        major:parts[6].trim()
-      };
+  const rd = parseReportPayload(displayMessage, forceReport);
+  if(rd){
       lastReport = rd;
       renderReport(rd, false);
       addMsg('ai','✨ 专属自我使用说明书已绘制完成！解锁下方的"我的使用说明书"查看深度志愿指南。');
@@ -1219,7 +1286,6 @@ function processResponse(raw){
 
       showChips(['我还有想补充的','解释专业','重新来一遍']);
       return;
-    }
   }
 
   // ── Standard Message Output ──
