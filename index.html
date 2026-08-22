@@ -804,6 +804,7 @@ let currentStep = 1; // Exactly 5 steps to complete
 // ── API proxy configuration ──
 const BASE_URL = 'https://self-manual-api.dirkalex83197112984.chatgpt.site/';
 const APP_TOKEN = '9786cf1df4d8900cf57363d090aba558cc17ce9aeec31597';
+try { localStorage.removeItem('self-manual-access'); } catch (_) {}
 let API_KEY  = APP_TOKEN;
 let MODEL    = 'doubao-seed-evolving';
 const ENDPOINT = 'https://self-manual-api.dirkalex83197112984.chatgpt.site/api/chat';
