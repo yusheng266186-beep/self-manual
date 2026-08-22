@@ -807,7 +807,7 @@ function readAccessToken() {
   const incoming = hash.get('access');
   if (incoming) {
     localStorage.setItem('self-manual-access', incoming);
-    history.replaceState(null, '', location.pathname + location.search);
+    window.history.replaceState(null, '', location.pathname + location.search);
     return incoming;
   }
   return localStorage.getItem('self-manual-access') || '';
