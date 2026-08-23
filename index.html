@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>自我使用说明书 - 高考志愿版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
-
 /* ── Reset ── */
 *{box-sizing:border-box;margin:0;padding:0}
 
@@ -23,7 +24,7 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
   overflow:hidden;
   display:flex;
   flex-direction:column;
-  height:740px;
+  height:min(740px,calc(var(--app-height,100dvh) - 32px));
   box-shadow:0 24px 56px rgba(32,28,24,0.18),0 4px 12px rgba(32,28,24,0.10);
   position: relative;
 }
@@ -43,6 +44,17 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
 .hd-text{}
 .hd-name{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:600;color:#2e2b27;letter-spacing:0.04em}
 .hd-sub{font-size:10px;color:#8a8278;margin-top:1px;letter-spacing:0.06em}
+
+/* ── Five-stage journey ── */
+.journey{height:27px;display:flex;align-items:center;justify-content:center;gap:0;padding:0 12px;border-bottom:.5px solid #ddd9cf;background:#f7f4ee;flex-shrink:0}
+.journey-step{display:flex;align-items:center;color:#a09890;font-size:8.5px;letter-spacing:.04em;white-space:nowrap}
+.journey-step::before{content:'';width:5px;height:5px;border-radius:50%;border:1px solid #c8c4b8;margin-right:4px;transition:.25s}
+.journey-step::after{content:'';width:9px;height:1px;background:#ddd9cf;margin:0 4px}
+.journey-step:last-child::after{display:none}
+.journey-step.done{color:#6f685f}
+.journey-step.done::before{background:#8f3d2c;border-color:#8f3d2c}
+.journey-step.active{color:#2e2b27;font-weight:700}
+.journey-step.active::before{background:#2e2b27;border-color:#2e2b27;box-shadow:0 0 0 3px rgba(46,43,39,.08)}
 
 /* ── Chat messages ── */
 .msgs{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
@@ -623,6 +635,54 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
   display: none;
   margin-top: -6px;
 }
+
+/* ── Reality profile before the final report ── */
+.profile-panel{position:absolute;inset:0;z-index:30;background:rgba(32,28,24,.62);display:none;align-items:flex-end;justify-content:center;border-radius:42px;overflow:hidden}
+.profile-panel.show{display:flex}
+.profile-sheet{width:100%;background:#faf7f2;border-radius:22px 22px 0 0;padding:20px 18px 18px;box-shadow:0 -12px 36px rgba(32,28,24,.18);animation:sheet-in .3s ease both}
+@keyframes sheet-in{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.profile-eye{font-size:9px;color:#8f3d2c;letter-spacing:.18em;font-weight:700;margin-bottom:5px}
+.profile-title{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:#2e2b27}
+.profile-sub{font-size:10.5px;line-height:1.6;color:#8a8278;margin:5px 0 13px}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.profile-field{background:#f1ebe1;border:1px solid #ddd5ca;border-radius:10px;padding:9px 10px;font-size:12px;color:#2e2b27;outline:none;min-width:0}
+.profile-field:focus{border-color:#8f3d2c}
+.profile-field.full{grid-column:1/-1}
+.profile-actions{display:flex;gap:8px;margin-top:12px}
+.profile-btn{flex:1;border:1px solid #2e2b27;border-radius:10px;padding:10px;background:transparent;color:#2e2b27;font-size:12px;font-weight:700;cursor:pointer}
+.profile-btn.primary{background:#2e2b27;color:#f7f4ee}
+
+/* ── Structured major cards and report actions ── */
+.major-cards{display:flex;flex-direction:column;gap:9px}
+.major-card{background:#fffaf3;border:1px solid #ddcbbd;border-radius:9px;padding:10px;position:relative;z-index:1}
+.major-card h4{font-family:'Noto Serif SC',serif;font-size:13px;color:#8f3d2c;margin-bottom:6px}
+.major-card p{font-size:10.5px;line-height:1.6;color:#4a423a;margin-top:4px}
+.major-card b{color:#2e2b27}
+.major-source-note{font-size:9px;color:#8a8278;line-height:1.6;margin-top:8px}
+.report-actions{display:flex;gap:8px;padding:4px 0 10px;flex-shrink:0}
+.report-action{flex:1;border:1px solid #2e2b27;border-radius:10px;padding:9px 6px;background:#faf7f2;color:#2e2b27;font-size:10.5px;font-weight:700;cursor:pointer}
+.report-action.primary{background:#2e2b27;color:#f7f4ee}
+
+@media (max-width:380px){
+  body{padding:0;display:block;background:#f7f4ee;overflow:hidden}
+  .phone-wrap{width:100%;height:var(--app-height,100dvh)}
+  .phone{width:100%;height:var(--app-height,100dvh);border:0;border-radius:0;box-shadow:none}
+  .notch{display:none}
+  .overlay,.profile-panel{border-radius:0}
+  .card{width:min(340px,calc(100vw - 20px));max-height:calc(var(--app-height,100dvh) - 30px)}
+  .journey{padding:0 6px}
+  .journey-step{font-size:8px}
+  .journey-step::after{width:5px;margin:0 3px}
+}
+@media (max-height:680px){
+  body{padding:0}
+  .phone{height:var(--app-height,100dvh);border-radius:0}
+  .notch{display:none}
+  .overlay,.profile-panel{border-radius:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}
+}
 </style>
 </head>
 <body>
@@ -635,9 +695,10 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
       <div class="hd-dot"></div>
       <div class="hd-text">
         <div class="hd-name">自我使用说明书</div>
-        <div class="hd-sub">高考志愿填报专属探索器</div>
+        <div class="hd-sub">高考专业方向 · 自我探索器</div>
       </div>
     </div>
+    <div class="journey" id="journey"></div>
 
     <!-- chat -->
     <div class="msgs" id="msgs"></div>
@@ -686,6 +747,10 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
         这是你目前的探索版本。版本会随你的选择而刷新。<br>
         <span class="r-brand">自我使用说明书 · 高考志愿探索版</span>
       </div>
+      <div class="report-actions">
+        <button class="report-action primary" onclick="saveReportImage()">保存图片</button>
+        <button class="report-action" onclick="copyReportText()">复制文字</button>
+      </div>
     </div>
 
     <!-- Bottom tab navigator -->
@@ -705,6 +770,24 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
     </div>
   </div>
 
+  <div class="profile-panel" id="profile-panel">
+    <div class="profile-sheet">
+      <div class="profile-eye">REALITY CHECK · 回到现实</div>
+      <div class="profile-title">让说明书真正落到你的路上</div>
+      <div class="profile-sub">这些信息只用来过滤明显不适合或无法报考的方向，不做院校录取预测。</div>
+      <div class="profile-grid">
+        <input class="profile-field" id="pf-province" placeholder="所在省份">
+        <input class="profile-field" id="pf-subjects" placeholder="选科组合">
+        <input class="profile-field full" id="pf-rank" placeholder="成绩或位次区间（可选）">
+        <input class="profile-field full" id="pf-limit" placeholder="排斥方向、城市/学费/体检限制（可选）">
+      </div>
+      <div class="profile-actions">
+        <button class="profile-btn" onclick="submitRealityProfile(true)">暂不填写</button>
+        <button class="profile-btn primary" onclick="submitRealityProfile(false)">带上这些信息</button>
+      </div>
+    </div>
+  </div>
+
   <!-- character card overlay with two tabs -->
   <div class="overlay" id="overlay">
     <div class="card">
@@ -713,6 +796,7 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
         <div>
           <div class="card-name" id="c-name">Ada Lovelace</div>
           <div class="card-era" id="c-era">数学家 · 1815–1852</div>
+          <div style="font-size:8.5px;color:#a09890;margin-top:2px">精神镜像 · 不代表专业结论</div>
         </div>
       </div>
       
@@ -753,7 +837,7 @@ body{background:#e8e4da;min-height:100vh;display:flex;align-items:center;justify
                 <div class="card-career-desc" id="c-majors" style="font-weight:700; color:#2e2b27; margin-bottom: 4px;"></div>
               </div>
               <div>
-                <div class="card-career-title">⚡ 行业生存现状与心理洗礼</div>
+                <div class="card-career-title">⚡ 真实学习与职业环境</div>
                 <div class="card-career-desc" id="c-reality"></div>
               </div>
             </div>
@@ -775,6 +859,8 @@ const INITIAL_OPTIONS = [
 ];
 
 let currentStep = 1; // Exactly 5 steps to complete
+const JOURNEY_STAGES = ['着迷','取舍','同路人','发光','说明书'];
+const SESSION_KEY = 'self_manual_session_v2';
 
 // ── DeepSeek official API configuration ──
 const BASE_URL = 'https://api.deepseek.com/';
@@ -790,15 +876,15 @@ const CHARACTER_DB = {
     promptName: "阿达",
     bioHistory: "英国诗人拜伦之女。在19世纪被整个科学界和母亲告知'女性的感性心智不适合做复杂的差分计算'，但她顶着社会蔑视和常年瘫痪的病痛，写下了世界上第一段计算机程序。",
     majors: "计算机科学与技术、软件工程、人工智能、数学与应用数学。",
-    reality: "这绝不是坐在CBD敲击键盘的体面生活。你将面临长达数小时甚至数十天静坐盯着冷光屏幕、在一万行代码中搜寻一个逗号错误的崩溃感。学习时需要忍受高数、离散数学、数据结构的超高智力摩擦。未来日常伴随高频的版本迭代与'不进则退'的技术贬值威胁，适合真正能享受绝对逻辑解密、不在乎现世掌声的沉浸式探索灵魂。"
+    reality: "计算机方向并不只有写出产品时的成就感，也包含长时间阅读代码、定位细小错误和反复重构。学习阶段要持续面对高数、离散数学、数据结构等抽象内容，工作后还需要不断更新技术。它更适合愿意独立钻研、能从解决复杂问题本身获得满足，并接受持续学习的人。"
   },
   'ZA': {
     name: "张爱玲",
     era: "文学巨匠 · 1920–1995",
     promptName: "张爱玲",
-    bioHistory: "没有正统的学位光环加冕，家庭极力窒息其创作，但她在孤绝清冷的公寓里对自己的文学敏感有着病态的绝对笃定。她甘愿将生命剥开，在冷眼旁观中书写市井俗人。",
+    bioHistory: "家庭环境一度压抑她的创作，但她始终相信自己的文学感受，在清冷的生活中保持观察，并以克制而敏锐的笔触书写普通人的复杂处境。",
     majors: "汉语言文学、戏剧影视文学、创意写作、新闻传播学。",
-    reality: "在AI写作秒级生成万字的时代，纯文字技能正在经历大清洗。学习中你必须直面毫无规律的经典背诵、枯燥的学术理论重构。毕业后你大概率面临为迎合商业算法而日产百篇同质化低质推文、公关稿的生存磨损。唯有骨子里流淌着病态的观察本能、不在意安稳生活的人，才能在这种精神沙化中守住独立。"
+    reality: "AI正在改变基础文字生产，但真正稀缺的仍是调查、判断、审美和清晰表达。学习阶段要阅读大量经典、写作并理解传播理论；就业可能进入教育、出版、媒体、内容策划或公共传播。适合愿意长期积累、持续观察现实，并能把表达能力与其他领域结合的人。"
   },
   'LQ': {
     name: "林巧稚",
@@ -806,7 +892,7 @@ const CHARACTER_DB = {
     promptName: "林巧稚",
     bioHistory: "中国妇产科学开拓者。顶着传统礼教'未婚女子染指产房大逆不道'的陈腐偏见和家人阻挠，毅然选择了当时极不受看好的妇产科。她终生未婚未育，几乎将产房当成生命的全部，亲手护送了5万名新生儿安全坠地。",
     majors: "临床医学、儿科学、妇产科学、医学影像学。",
-    reality: "医学是典型的高壁垒、长周期的残酷修行，5年本科+3年规培只是起点。学习期间你将被药理学、解剖学等无尽的知识盲区考试淹没。日常工作更是高压力、高负荷的高速机器轮转：急诊紧急召回、半夜轮班、生死抉择往往在一瞬间发生。如果没有纯粹而健壮的利他精神，极易在中途崩溃、耗竭。"
+    reality: "医学培养周期长、课程密度高，通常还要经历临床训练和规范化培训。药理、解剖与临床判断都需要稳定投入，部分岗位伴随夜班和高责任压力。除了帮助他人的愿望，还需要评估自己的耐力、细节意识、沟通能力以及对长期学习的接受度。"
   },
   'WJ': {
     name: "吴健雄",
@@ -822,7 +908,7 @@ const CHARACTER_DB = {
     promptName: "郑毓秀",
     bioHistory: "民国奇女子。在'女性进法庭执业被视为荒谬神话'的陈旧法权束缚中，她作为携带炸弹的革命党人、中国首位法学女博士，单枪匹马杀入政法体制，硬生生砸碎了旧规则。",
     majors: "法学、国际法、知识产权、政治学与行政学。",
-    reality: "这绝非屏幕上西装革履、神采飞扬的法庭脱口秀。学习时需要死记硬背堆积如山的晦涩法条。执业后，你面临的是充满利益博弈、复杂的底层社会人情纠纷与程序拖延。你需要极高的情商在冰冷传统的法律大厦和人情关系网中长袖善舞，如果骨子里缺乏冷酷、滴水不漏的逻辑防线，很容易被行业高压吞噬。"
+    reality: "法学不只是法庭表达，还包括大量条文、案例检索、证据分析和程序工作。就业方向差异很大，可能面对长期材料整理、沟通协调与利益冲突。它需要严密逻辑、清晰表达、耐心和边界感，也需要尽早了解法考、升学与不同岗位的真实门槛。"
   },
   'JM': {
     name: "约翰·梅纳德·凯恩斯",
@@ -830,7 +916,7 @@ const CHARACTER_DB = {
     promptName: "凯恩斯",
     bioHistory: "现代宏观经济学奠基人。其理论在提出初期被古典自由学派疯狂围剿攻击多年，但他坚信国家宏观调控的科学性，最终在万马齐喑的经济萧条里挽救了整个世界的实体秩序。",
     majors: "经济学、金融学、精算学、数据科学。",
-    reality: "这个方向极讲求冷酷的市场大局博弈。学习阶段你将饱受宏微观经济数学模型、复杂概率论、资产定价公式的折磨。未来你的生存状态是应对冷冰冰的数字模型和极具迷惑性的大众盲从。如果你容易受他人情绪、外界跟风影响，缺乏独立在宏观棋局上落子和逆风决策的定力，很容易在市场震荡中成为被收割的盲从者。"
+    reality: "经济与金融方向既需要理解宏观环境，也要学习数学、统计、会计和资产定价等工具。就业并不等同于投资交易，还包括研究、风控、运营和公共部门。适合愿意用数据检验判断、能独立思考，并接受市场变化与持续学习的人。"
   },
   'LM': {
     name: "拉马努金",
@@ -846,7 +932,7 @@ const CHARACTER_DB = {
     promptName: "司马迁",
     bioHistory: "因李陵事件惨遭宫刑。在尊严和身心被彻底撕碎的屈辱炼狱中，他隐忍下来，将余生孤注一掷熔铸于笔端，写出'史家之绝唱'的巨作《史记》，照亮华夏千年。",
     majors: "历史学、考古学、古籍整理与研究、档案学。",
-    reality: "这是远离高回报、高商业化节奏的慢热学科。学习需要你花费数千小时啃读晦涩古文和斑驳文献。毕业后的出路大多流向沉寂边缘的研究所、博物馆、档案室。没有高薪和快钱的风口，你必须拥有超脱凡俗、能忍得住清贫、在千年长河中安放一颗孤零灵魂的浩瀚定力。"
+    reality: "历史与考古属于需要长期阅读、材料辨析和耐心积累的慢热学科。就业可以进入教育、文化机构、出版、档案、公共服务或继续深造，但不同方向门槛差异明显。适合真正享受从材料中还原问题，也愿意把研究能力转化为表达与实践的人。"
   },
   'DW': {
     name: "达尔文",
@@ -854,7 +940,7 @@ const CHARACTER_DB = {
     promptName: "达尔文",
     bioHistory: "登上贝格尔号经受5年致命晕船与热带瘟疫折磨，在数十年的归纳后提出进化论。面对全英宗教和旧保守势力的妖魔化围剿打压，坚持用证据捍卫客观真理的铁律。",
     majors: "生物科学、生态学、环境工程、野生动物与自然保护。",
-    reality: "这绝非坐在CBD明亮写字楼里的精致工作。往往伴随着高频的野外踏勘、泥泞的样本采集、风吹日晒与生理耐力极限。实验中你将面临极高难度的化学分析、微生物分类和极易失败的培养闭环，如果对基因、物种演化没有骨子里的狂热好奇，这类专业极易在日复一日的体力与繁复测序中消耗光所有热情。"
+    reality: "生物与生态方向可能同时包含实验室工作、数据分析和野外调查。培养实验失败、样本整理和重复验证都是日常，高年级往往还要接触化学、统计与编程。适合对生命问题保持稳定好奇，并愿意接受细致、重复和较长研究周期的人。"
   },
   'TS': {
     name: "特斯拉",
@@ -862,7 +948,7 @@ const CHARACTER_DB = {
     promptName: "特斯拉",
     bioHistory: "划时代的电气巨天才。其交流电发明和多项伟大专利长期遭到爱迪生等商业帝国的强权侵夺和刻意抹杀。尽管晚景极其凄凉，但他纯粹的技术执念依然彻底点亮了现代电网世界。",
     majors: "电气工程及其自动化、新能源科学与工程、自动化、微电子科学。",
-    reality: "重工理工方向是讲求极端精密、逻辑和体力的苦修。学习期间，你将和高深厚重的电磁场、数电模电、信号与系统反复磨砺。在现代工业大厂，你的创新大概率会被封装在大系统的某一个极其狭窄的小零件内，甚至因为商业和专利归属规则而无法获得应得的名利。需要极强的系统韧性和甘为无名基石的心胸。"
+    reality: "电气与自动化方向重视数学、物理和系统思维，核心课程常包括电磁场、数电模电、控制与信号系统。真实工程往往是大型系统中的协作，需要反复测试、规范意识和现场经验。适合愿意把抽象原理落到可靠设备，并接受长期工程迭代的人。"
   },
   'ZL': {
     name: "赵萝蕤",
@@ -870,17 +956,17 @@ const CHARACTER_DB = {
     promptName: "赵萝蕤",
     bioHistory: "中国现代翻译丰碑。顶着战乱颠沛，凭无上人文学养首度精准译出难度极高、充斥着现代主义碎片化的文学天书《荒原》，撑起学界骨脊，一生淡泊名利，隐于市井。",
     majors: "英语文学、比较文学、翻译学、汉语言文学。",
-    reality: "在人工智能秒级翻译、精准度极速迭代的今天，纯语言工具面临前所未有的贬值危机。选择文学和翻译，意味着你的学习日常需要直面超大体量、令人窒息的跨文化批判阅读、学术史梳理。未来工作极其讲求人文学养的极慢速积淀，没有快钱套利，必须有守卫精神城堡、只为文字里那一点点人性温度而深耕的崇高人文定力。"
+    reality: "AI正在改变基础翻译工作，语言专业需要更多跨文化理解、研究、编辑和领域知识。学习阶段包含大量阅读、写作与表达训练，就业竞争力通常来自“语言＋法律、商务、科技或教育”等组合能力。适合愿意长期积累，并主动建立第二专业能力的人。"
   }
 };
 
 // ── System Prompt for the Main Discovery Guide ──
 const SYSTEM = `你是'自我使用说明书'，帮助高考生在填志愿前生成专属自我认知与专业选择探索报告的助手。
 
-你通过深度对话追问，层层剖析，并提供4个超精简的预设选项辅助。
+你通过深度对话追问，帮助学生看见自己的驱动力、适配环境与值得继续调研的专业方向，并提供4个超精简的预设选项辅助。本项目不是院校录取预测工具。
 
 说话原则：
-- 语言简短而锋利，不要说废话，不长篇大论。
+- 语言简短、真诚、有洞察，但不要审判学生、制造焦虑或使用夸张恐吓式表达。
 - 每次对话只问一个问题。每轮回复控制在80字以内，追问控制在40字以内。
 - 每次追问后，必须提供不多于4个的极简预设选项，格式严格如下：
   【选项】选项A||选项B||选项C||选项D
@@ -900,12 +986,12 @@ B. 爱好与专业的关系：挖出用户对'把爱好当职业'的真实态度
    - "你更怕的是：毕业后发现工作跟兴趣完全无关，还是发现工作把兴趣榨干了？"
    - "有人说：喜欢的东西不要碰专业，留着当退路。你认同吗，为什么？"
 
-C. 想要的生活方式（人物和专业匹配）：根据用户喜好，匹配一位历史人物，触发人物卡片。
+C. 想要的生活方式（人物精神镜像）：根据用户的驱动力匹配一位可产生共鸣的历史人物，触发人物卡片。人物只是精神镜像，绝不能作为专业推荐的直接依据。
    人物卡片格式（每个字段严格按规定）：
    【人物卡片】人物真实姓名||职业与年代（与数据库一致）||两字母缩写（必须严格是 AL/ZA/LQ/WJ/ZY/JM/LM/SM/DW/TS/ZL 之一，这是最关键字段！）||第一人称独白（50字内）||一句反问考生的话（30字内）
    ⚠️ 重要：两字母缩写必须准确对应人物，系统会用它从数据库读取所有标准信息，名字和年代只做展示参考。
    
-   匹配规则（硬性对应）：
+   匹配规则（仅用于寻找精神镜像）：
    - 计算机/程序/算法/代码 → AL（Ada Lovelace）
    - 文学/写作/小说/故事 → ZA（张爱玲）
    - 医学/医生/救治/药学 → LQ（林巧稚）
@@ -927,13 +1013,14 @@ E. 已知Bug（耗电模式）：探索何种状态会迅速消耗其精力。
    必须用具象场景引导，比如：
    - "想象你在做一个团队项目，有人一直在改方向、否定你的思路，你的第一反应是什么？"
    - "什么情况会让你觉得一天白过了、特别空虚——是什么都没做完，还是做了很多但感觉没意义？"
-   - "你最讨厌的一种人或状态是什么？这往往说明你的性格暗角在哪里。"
+   - "你最难适应的一种人或状态是什么？这往往能看见你的边界和耗电来源。"
 
 说明书输出格式（终局标志）：
-当挖完五个维度后，你必须生成说明书。为了利于社交传播和启发性，每个维度必须输出结构化的内容（严禁流于表面、千篇一律地重复前面的废话，必须一针见血剖析性格痛点，给用户兴奋感）：
-每个维度的结构格式必须为：【概括】一句话极具特性的总结概括。【深度解析】测评结果般的启发式解析，多给用户一些兴奋点，解构性格暗角。【行动启示】指引高考志愿和自我发展的切实落地行动点。
+当挖完五个维度后，你必须生成说明书。每个维度必须输出结构化内容，具体、有辨识度，但不要使用诊断式或给人定性的口吻：
+每个维度的结构格式必须为：【概括】一句话总结。【深度解析】结合用户说过的具体细节进行温和而有穿透力的解释。【行动启示】给出可以验证、可以行动的建议。
 你必须输出符合上述格式的整段结构化说明书：
-【说明书】专属称号||一句话Tagline||核心驱动（需符合【概括】【深度解析】【行动启示】结构）||发光条件（需符合该结构）||使用须知（需符合该结构）||已知Bug（需符合该结构）||建议报考专业方向与现实图景说明（说明中必须包含2-3个现代具体专业，并指出这些专业在现实中毕业后的就业状态/结合匹配历史人物遭遇给出需要做的心理洗礼与3个具体落地学习困难）
+【说明书】专属称号||一句话Tagline||核心驱动（需符合【概括】【深度解析】【行动启示】结构）||发光条件（需符合该结构）||使用须知（需符合该结构）||已知Bug（需符合该结构）||建议报考专业方向与现实图景说明
+最后一个专业字段必须包含2-3个专业，并严格使用：专业名::为什么适合::核心课程与常见选科门槛::真实学习困难和就业环境::未来七天的低成本验证方法。多个专业之间用###分隔。专业建议必须结合学生补充的省份、选科、位次和限制；信息未填写时明确标注“需核对”，不得虚构录取结论。
 
 禁止：不说"我非常理解你的感受"之类的敷衍词，不连续提两个问题。`;
 
@@ -965,6 +1052,7 @@ let cardShown = false;
 let pendingCardQ = '';   
 let reportDone = false;
 let lastReport = null;
+let profileCollected = false;
 
 // Character Card Dialogue States
 let activeCharCode = '';
@@ -982,6 +1070,66 @@ const choicesGrid = document.getElementById('choices-grid');
 
 const cardChatWin = document.getElementById('card-chat-win');
 const cardChatInp = document.getElementById('card-chat-input');
+
+function journeyIndex(){
+  if(reportDone || currentStep >= 9) return 5;
+  if(currentStep <= 2) return 1;
+  if(currentStep <= 3) return 2;
+  if(currentStep <= 5) return 3;
+  return 4;
+}
+function renderJourney(){
+  const wrap = document.getElementById('journey');
+  const active = journeyIndex();
+  wrap.innerHTML = '';
+  JOURNEY_STAGES.forEach((name,i)=>{
+    const el = document.createElement('div');
+    el.className = 'journey-step' + (i+1<active?' done':'') + (i+1===active?' active':'');
+    el.textContent = name;
+    wrap.appendChild(el);
+  });
+}
+
+function saveSession(){
+  if(!history.length) return;
+  try{
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      currentStep, history, cardShown, reportDone, lastReport, profileCollected,
+      pendingOptions, msgsHTML:msgsEl.innerHTML, savedAt:Date.now()
+    }));
+  }catch(e){}
+}
+function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+function restoreSession(){
+  try{
+    const s = JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
+    if(!s || !Array.isArray(s.history) || !s.msgsHTML) return false;
+    currentStep = Number(s.currentStep)||1;
+    history = s.history;
+    cardShown = !!s.cardShown;
+    reportDone = !!s.reportDone;
+    lastReport = s.lastReport || null;
+    profileCollected = !!s.profileCollected;
+    pendingOptions = Array.isArray(s.pendingOptions) ? s.pendingOptions : [];
+    msgsEl.innerHTML = s.msgsHTML;
+    if(reportDone && lastReport){
+      renderReport(lastReport, false);
+      unlockReportTab();
+      showChips(['我还有想补充的','解释专业','重新来一遍']);
+    }else{
+      if(cardShown && !pendingOptions.length) pendingOptions = ['继续探索'];
+      renderChoices(pendingOptions);
+    }
+    renderJourney();
+    setTimeout(()=>{ msgsEl.scrollTop=msgsEl.scrollHeight; },80);
+    return true;
+  }catch(e){ clearSession(); return false; }
+}
+
+function syncViewportHeight(){
+  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', h+'px');
+}
 
 function autoH(el){ el.style.height='38px'; el.style.height=Math.min(el.scrollHeight,80)+'px'; }
 function onKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
@@ -1110,6 +1258,15 @@ async function send(){
   // 1. Ensure user message bubble is strictly inserted first
   await addMsg('user', esc(text));
   history.push({role:'user', content:text});
+
+  /* 最终说明书前先补一次现实条件，避免只凭性格直接推荐专业。 */
+  if(currentStep >= 9 && !reportDone && !profileCollected){
+    choicesBox.style.display = 'none';
+    document.getElementById('profile-panel').classList.add('show');
+    renderJourney();
+    saveSession();
+    return;
+  }
   
   // 2. Spawn typing dots strictly under the user bubble
   waiting = true; 
@@ -1136,10 +1293,10 @@ async function send(){
     } else if (currentStep === 7) {
       stepGuidance = "\n【第5步：已知Bug和耗电模式。简评用户的发光特质，然后用一个具象场景挖耗电模式——比如：想象你在做团队项目，有人一直改方向否定你思路，你的第一反应是什么？或：什么情况会让你觉得一天白过了？附带【选项】格式。】";
     } else if (currentStep === 8) {
-      stepGuidance = "\n【第5步追问。对用户的Bug信号做一句穿透性的解读，继续追问：你最讨厌的一种人或状态是什么？这往往暴露你最深的性格暗角。附带【选项】格式。】";
+      stepGuidance = "\n【第5步追问。对用户的耗电信号做一句温和而具体的解读，继续追问：你最难适应的一种人或状态是什么？这往往能看见你的边界和耗电来源。附带【选项】格式。】";
     } else if (currentStep >= 9) {
       expectingReport = true;
-      stepGuidance = "\n【终局！现在立刻整合所有对话信息，输出完整说明书。格式：【说明书】专属称号||一句话Tagline||核心驱动（含【概括】【深度解析】【行动启示】结构）||发光条件（含该结构）||使用须知（含该结构）||已知Bug（含该结构）||建议报考专业方向与现实图景说明（含2-3个具体专业，结合匹配历史人物的挫折经历，给出3个极接地气的现实学习困难和真实就业洗礼）。每部分【深度解析】必须极具穿透力，激发兴奋点，解构性格暗角！】";
+      stepGuidance = "\n【终局！现在整合全部谈心内容与学生补充的现实条件，输出完整说明书。格式：【说明书】专属称号||一句话Tagline||核心驱动（含【概括】【深度解析】【行动启示】结构）||发光条件（含该结构）||使用须知（含该结构）||已知Bug（含该结构）||专业卡。专业卡必须给2-3个具体专业，每个严格写成：专业名::为什么适合::核心课程与常见选科门槛::真实学习困难和就业环境::未来七天的低成本验证方法，多个专业用###分隔。历史人物只作精神镜像，不能代替专业判断；现实信息不足的门槛必须写“需核对”。语言温和、具体、有理想感，不使用诊断、恐吓或夸张定性。】";
     }
   } else {
     stepGuidance = "\n【说明书已生成。请友好地根据用户的补充信息或对推荐专业方向的咨询进行个性化探讨和简练解答。不要提出新的测试题，也不需要重新输出【说明书】标签。语言简练、针对性强。】";
@@ -1190,7 +1347,25 @@ async function send(){
       choicesBox.style.pointerEvents = 'all';
       if (pendingOptions.length) renderChoices(pendingOptions);
     }
+    renderJourney();
+    if(succeeded) saveSession();
   }
+}
+
+function submitRealityProfile(skip){
+  const val = id => document.getElementById(id).value.trim();
+  let text = '我的现实条件：';
+  if(skip){
+    text += '暂不补充，请只给专业探索方向，并明确提醒我之后核对官方要求。';
+  }else{
+    text += '省份：'+(val('pf-province')||'未填写')+'；选科：'+(val('pf-subjects')||'未填写')+'；成绩或位次：'+(val('pf-rank')||'未填写')+'；其他限制：'+(val('pf-limit')||'暂无')+'。';
+  }
+  profileCollected = true;
+  document.getElementById('profile-panel').classList.remove('show');
+  choicesBox.style.opacity = '1';
+  choicesBox.style.pointerEvents = 'all';
+  inp.value = text;
+  send();
 }
 
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1544,6 +1719,8 @@ async function triggerNextStep(){
   } finally {
     removeTyping();
     waiting = false;
+    renderJourney();
+    saveSession();
   }
 }
 
@@ -1604,7 +1781,7 @@ function parseAestheticContent(rawText) {
 
   let html = '';
   if (summary) {
-    html += `<div class="r-txt-summary">⚡ 诊断概括：${esc(summary)}</div>`;
+    html += `<div class="r-txt-summary">⚡ 一眼看见：${esc(summary)}</div>`;
   }
   if (insight) {
     html += `<div class="r-txt-insight">🔮 启发式解读：${esc(insight)}</div>`;
@@ -1619,6 +1796,20 @@ function parseAestheticContent(rawText) {
 const DIMS = [
   ['核心驱动','drive'],['发光条件','glow'],['使用须知','note'],['已知 Bug','bug']
 ];
+
+function renderMajorCards(raw){
+  const items = String(raw||'').split(/\s*###\s*/).map(s=>s.trim()).filter(Boolean);
+  const parsed = items.map(item=>item.split(/\s*::\s*/).map(s=>s.trim())).filter(parts=>parts.length>=4);
+  if(!parsed.length) return '<div class="r-txt">'+esc(String(raw||''))+'</div>';
+  return '<div class="major-cards">'+parsed.slice(0,3).map(parts=>{
+    const [name,fit,courses,reality,trial='先找一节公开课或一次真实任务体验。'] = parts;
+    return '<div class="major-card"><h4>'+esc(name)+'</h4>'+
+      '<p><b>为什么适合：</b>'+esc(fit)+'</p>'+
+      '<p><b>课程与门槛：</b>'+esc(courses)+'</p>'+
+      '<p><b>真实图景：</b>'+esc(reality)+'</p>'+
+      '<p><b>七天验证：</b>'+esc(trial)+'</p></div>';
+  }).join('')+'</div><div class="major-source-note">专业方向仅用于继续调研；请以本省考试院、院校招生章程和最新培养方案为准。</div>';
+}
 
 function renderReport(rd, flash=false){
   document.getElementById('r-badge').textContent    = rd.badge;
@@ -1651,18 +1842,63 @@ function renderReport(rd, flash=false){
     el.appendChild(div);
   });
 
-  // Highlight Major directions with the Gold Diagnosis Certificate
+  // Structured major directions
   const majorDiv = document.createElement('div');
   majorDiv.className = 'r-block major-recommendation' + (flash ? ' flash' : '');
   majorDiv.style.animationDelay = flash ? '0ms' : '250ms';
   majorDiv.innerHTML = `
     <div class="r-block-head">
       <span class="r-icon">🧭</span>
-      <span class="r-lbl">志愿诊断：现代专业与现实生存写照</span>
+      <span class="r-lbl">专业方向：适配理由与现实图景</span>
     </div>
-    <div class="r-txt">${esc(rd.major)}</div>
+    ${renderMajorCards(rd.major)}
   `;
   el.appendChild(majorDiv);
+}
+
+function showNotice(text){
+  const old = document.getElementById('global-notice'); if(old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'global-notice'; el.textContent = text;
+  el.style.cssText = 'position:absolute;left:50%;bottom:82px;transform:translateX(-50%);z-index:80;background:#2e2b27;color:#f7f4ee;padding:9px 15px;border-radius:18px;font-size:10.5px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.18)';
+  document.querySelector('.phone-wrap').appendChild(el);
+  setTimeout(()=>el.remove(),2400);
+}
+
+function ensureHtml2Canvas(){
+  if(window.html2canvas) return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+    s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
+  });
+}
+
+async function saveReportImage(){
+  if(!lastReport){ showNotice('说明书尚未生成'); return; }
+  try{
+    showNotice('正在整理图片…');
+    await ensureHtml2Canvas();
+    if(document.fonts?.ready) await Promise.race([document.fonts.ready,waitMs(2200)]);
+    const canvas = await html2canvas(document.querySelector('.poster-card'),{scale:2,backgroundColor:'#faf7f2',useCORS:true,logging:false});
+    const a=document.createElement('a');
+    a.download='自我使用说明书-'+new Date().toLocaleDateString('zh-CN').replace(/\//g,'-')+'.png';
+    a.href=canvas.toDataURL('image/png'); a.click();
+    showNotice('说明书图片已保存');
+  }catch(e){ showNotice('保存失败，请稍后重试'); }
+}
+
+function copyReportText(){
+  if(!lastReport){ showNotice('说明书尚未生成'); return; }
+  const r=lastReport;
+  const text='《自我使用说明书》\n'+r.badge+'\n'+r.tagline+'\n\n核心驱动\n'+r.drive+'\n\n发光条件\n'+r.glow+'\n\n使用须知\n'+r.note+'\n\n已知 Bug\n'+r.bug+'\n\n专业方向\n'+String(r.major||'').replace(/###/g,'\n\n').replace(/::/g,'：');
+  const done=()=>showNotice('说明书文字已复制');
+  if(navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  else fallbackCopy(text,done);
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');done();}catch(e){showNotice('复制失败，请手动选择');}ta.remove();
 }
 
 // ── Quick-reply chips ──
@@ -1683,7 +1919,9 @@ function chipClick(label){
   if(label === '重新来一遍'){
     currentStep = 1;
     history = [];
-    cardShown = false; reportDone = false; lastReport = null; pendingCardQ = ''; pendingOptions = [];
+    cardShown = false; reportDone = false; lastReport = null; pendingCardQ = ''; pendingOptions = []; profileCollected = false;
+    clearSession();
+    ['pf-province','pf-subjects','pf-rank','pf-limit'].forEach(id=>document.getElementById(id).value='');
     msgsEl.innerHTML = '';
     document.getElementById('r-badge').textContent = '—';
     document.getElementById('r-line').textContent  = '说明书生成后显示在这里';
@@ -1699,6 +1937,7 @@ function chipClick(label){
 
     choicesBox.style.display = 'flex';
     switchTab('chat');
+    renderJourney();
     
     // Restart conversation with original options
     setTimeout(() => bootChat(), 300);
@@ -1745,8 +1984,15 @@ function bootChat() {
   }, 500);
 }
 
-window.addEventListener('load',()=>{
-  bootChat();
+syncViewportHeight();
+window.addEventListener('resize',syncViewportHeight);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',syncViewportHeight);
+  window.visualViewport.addEventListener('scroll',syncViewportHeight);
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  renderJourney();
+  if(!restoreSession()) bootChat();
 });
 </script>
 </body>
