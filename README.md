@@ -6,6 +6,25 @@
 
 > 在线体验：[打开自我使用说明书](https://yusheng266186-beep.github.io/self-manual/) · 项目仓库：[查看源代码](https://github.com/yusheng266186-beep/self-manual)
 
+<!-- project-navigation:start -->
+## 项目概览
+
+| 项目 | 说明 |
+| --- | --- |
+| 分类 | 选科与升学探索 |
+| 平台 | 浏览器 / AI 对话 |
+| 当前定位 | 专业探索工具 |
+
+从真实经历、热爱和情境对话出发，帮助高中生整理核心驱动与专业探索方向。
+
+[在线体验](https://yusheng266186-beep.github.io/self-manual/) · [使用与开发](#适合谁使用) · [项目总导航](https://github.com/yusheng266186-beep/yusheng266186-beep)
+
+本项目聚焦自我与专业探索；[北辰](https://github.com/yusheng266186-beep/beichen) 聚焦选科，[南溟](https://github.com/yusheng266186-beep/nanming) 结合院校专业和招生数据探索高考目标。
+
+**阅读导航：** [适合谁使用](#适合谁使用) · [已知限制](#已知限制) · [目录结构](#目录结构)
+
+<!-- project-navigation:end -->
+
 ## 项目定位
 
 很多专业选择工具从分数、排名或职业名称开始，但学生真正困难的部分往往是：知道世界上有很多专业，却还说不清自己想过怎样的生活。
